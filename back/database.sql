@@ -7,7 +7,6 @@ CREATE TABLE utilisateur (
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL CHECK (LENGTH(password) >= 6),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    dark_mode BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- ============================
