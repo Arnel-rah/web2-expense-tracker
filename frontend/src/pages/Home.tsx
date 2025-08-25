@@ -18,7 +18,7 @@ export default function Home() {
                         Efficient Money Tracking & Management
                     </h2>
                     <p className="text-lg text-gray-600 max-w-md">
-                        Take full control of your money and achieve financial stability with MoneyTrack
+                        Take full control of your money and achieve financial stability with Expense Tracker
                     </p>
                 </section>
 
