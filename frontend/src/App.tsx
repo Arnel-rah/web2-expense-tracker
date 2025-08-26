@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Auth from './pages/auth/Auth';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
-import Header from './components/layout/Header';
 
 function App() {
   return (
