@@ -28,7 +28,6 @@ export default function Dashboard() {
   const [selectedMonth, setSelectedMonth] = useState<string>('2024-01');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  // Charger les données avec des valeurs réalistes comme Chart.js examples
   useEffect(() => {
     // Tous les depense
     const sampleExpenses: Expense[] = [
