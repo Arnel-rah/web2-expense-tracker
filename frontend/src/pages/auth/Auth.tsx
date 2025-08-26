@@ -10,8 +10,8 @@ interface AuthProps {
 
 const Auth: React.FC<AuthProps> = ({ mode }) => {
   // Valeurs par défaut pour le login
-  const [email, setEmail] = useState(mode === 'login' ? 'demo@example.com' : '');
-  const [password, setPassword] = useState(mode === 'login' ? 'password123' : '');
+  const [email, setEmail] = useState(mode === 'login' ? 'user@gmail.com' : '');
+  const [password, setPassword] = useState(mode === 'login' ? '1234' : '');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,8 +20,8 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   // Réinitialiser les champs quand on change de mode (login/signup)
   useEffect(() => {
     if (mode === 'login') {
-      setEmail('demo@example.com');
-      setPassword('password123');
+      setEmail('user@gmail.com');
+      setPassword('1234');
     } else {
       setEmail('');
       setPassword('');
