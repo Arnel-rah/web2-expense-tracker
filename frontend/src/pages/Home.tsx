@@ -1,7 +1,7 @@
 export default function Home() {
     return (
-        <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-            <div className="flex w-full md:w-1/2 flex-col justify-center p-8 md:p-12 space-y-8">
+        <div className="flex flex-col min-h-[100%] bg-gradient-to-br from-blue-50 to-indigo-100 lg:flex-row">
+            <div className="flex h-screen w-full lg:w-1/2 flex-col justify-center p-8 md:p-12 space-y-8">
                 <header className="flex items-center space-x-4 absolute left-7 top-2">
                     <img
                         src="/public/expense-logo.png"
@@ -29,7 +29,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="hidden md:block w-1/2">
+            <div className="w-full lg:h-screen lg:w-1/2">
                 <img
                     src="/public/expenseImage.jpg"
                     alt="Expense tracking illustration"
