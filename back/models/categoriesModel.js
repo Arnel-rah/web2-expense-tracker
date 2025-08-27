@@ -1,5 +1,5 @@
 //lister les catégories
-const getCategories = async (userId) =>{
+const getCategoriesDb = async (userId) =>{
     const result = await pool.query(
     "SELECT * FROM categorie WHERE user_id = $1",
     [userId]
@@ -7,7 +7,7 @@ const getCategories = async (userId) =>{
 };
 
 // créer une catégorie
-const createCategory = async (userId, name) =>{
+const createCategoryDb = async (userId, name) =>{
     const result = await pool.query(
     `INSERT INTO categorie(user_id, name)
     VALUES ($1, $2)
@@ -17,7 +17,7 @@ const createCategory = async (userId, name) =>{
 };
 
 //changer  le nom d'une catégorie
-const updateCategory = async (categoryId, userId, name) => {
+const updateCategoryDb = async (categoryId, userId, name) => {
   const result = await pool.query(
     `UPDATE categorie 
      SET name = $1 
@@ -30,7 +30,7 @@ const updateCategory = async (categoryId, userId, name) => {
 };
 
 //supprimer une catégorie
-const deleteCategory = async (categoryId, userId) => {
+const deleteCategoryDb = async (categoryId, userId) => {
   const result = await pool.query(
     `DELETE FROM categorie
      WHERE id = $1 AND user_id = $2
