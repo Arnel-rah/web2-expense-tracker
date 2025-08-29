@@ -1,7 +1,4 @@
-// controllers/profileController.js
-import {
-  findProfileById
-} from "../models/profileModel.js";
+import {findProfileById} from "../models/profileModel.js";
 
 //Récupérer le profil (connecté)
 export const getProfile = async (req, res) => {
