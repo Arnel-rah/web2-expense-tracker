@@ -58,7 +58,7 @@ export const updateIncome = async (req, res) => {
   const { amount, date, source, description } = req.body;
   const token = req.headers.authorization?.split(' ')[1];
   const userId = jwt.verify(token, config.jwtSecret).userId;
-  const query = 'UPDATE incomes SET amount = $1, date = $2, source = $3, description = $4 WHERE id = $5 AND user_id = $6 RETURNING *';
+  const query = 'UPDATE revenu SET amount = $1, "date" = $2, source = $3, description = $4 WHERE income_id = $5 AND user_id = $6 RETURNING *';
   const values = [amount, date, source, description, req.params.id, userId];
 
   try {
