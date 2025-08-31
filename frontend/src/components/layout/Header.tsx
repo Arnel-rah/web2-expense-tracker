@@ -1,11 +1,25 @@
 import React from 'react';
 import { logout } from '../../services/backend';
 import Button from '../ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const handleLogout = () => {
     logout();
     window.location.href = '/login';
+  };
+
+  const handleDashboard = () => {
+    navigate("/dashboard")
+  };
+  
+  const handleFinancial = () => {
+    navigate("/expenses")
+  };
+  
+  const handleProfil = () => {
+    navigate("/profile")
   };
 
   return (
@@ -16,7 +30,13 @@ const Header: React.FC = () => {
           <img src="expense-logo.png" alt="expense-logo" className='size-15' />
           <p className='flex flex-col'>nse <span className='text-xs'>Tracker</span></p>
         </div>
-        <div className="flex items-center space-x-4">
+
+        <div className="flex items-center gap-15 text-gray-600">
+          <div className='flex items-center gap-5 font-semibold text-xl'>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleDashboard}>Dashboard</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleFinancial}>Financial</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleProfil}>Profil</p>
+          </div>
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </div>
