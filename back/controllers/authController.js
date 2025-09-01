@@ -4,7 +4,7 @@ import config from "../config/config.js";
 import { createUser, findUserByEmail } from "../models/userModel.js";
 
 // Inscription
-export const register = async (req, res) => {
+export const signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
