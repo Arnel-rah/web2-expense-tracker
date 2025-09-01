@@ -1,8 +1,8 @@
 import express from 'express';
-import { signup, login, getProfile } from '../controllers/authController.js';
+import { signup, login} from '../controllers/authController.js';
 import { logRequest } from '../middlewares/example.js';
 import { authenticate } from '../middlewares/auth.js';
-
+import { getProfile } from '../controllers/profileController.js';
 const router = express.Router();
 
 router.use(logRequest);
