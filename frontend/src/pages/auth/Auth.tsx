@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { login, signup } from '../../services/backend';
+// import { login, signup } from '../../services/backend';
 
 interface AuthProps {
   mode: 'login' | 'signup';
