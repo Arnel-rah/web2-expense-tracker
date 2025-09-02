@@ -2,26 +2,87 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { login, signup } from '../../services/backend';
 
 interface AuthProps {
   mode: 'login' | 'signup';
 }
 
+interface AuthResponse {
+  token?: string;
+  message?: string;
+  user?: {
+    id: number;
+    email: string;
+    createdAt: string;
+  };
+}
+
 const Auth: React.FC<AuthProps> = ({ mode }) => {
-  // Valeurs par défaut pour le login
-  const [email, setEmail] = useState(mode === 'login' ? 'demo@example.com' : '');
-  const [password, setPassword] = useState(mode === 'login' ? 'password123' : '');
+  const API_BASE_URL = 'http://localhost:8080/api';
+  
+  const [email, setEmail] = useState(mode === 'login' ? 'user@gmail.com' : '');
+  const [password, setPassword] = useState(mode === 'login' ? '1234' : '');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Réinitialiser les champs quand on change de mode (login/signup)
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data: AuthResponse = await response.json();
+      
+      if (response.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        return true;
+      } else {
+        setError(data.message || 'Login failed');
+        return false;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Cannot connect to server. Please make sure the backend is running on port 8080.');
+      return false;
+    }
+  };
+
+  const signup = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data: AuthResponse = await response.json();
+      
+      if (response.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        return true;
+      } else {
+        setError(data.message || 'Registration failed');
+        return false;
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError('Cannot connect to server. Please make sure the backend is running on port 8080.');
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (mode === 'login') {
-      setEmail('demo@example.com');
-      setPassword('password123');
+      setEmail('user@gmail.com');
+      setPassword('1234');
     } else {
       setEmail('');
       setPassword('');
@@ -42,8 +103,10 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
           setIsLoading(false);
           return;
         }
-        else {
-          navigate("/dashboard")
+        if (password.length < 4) {
+          setError("Password must be at least 4 characters long");
+          setIsLoading(false);
+          return;
         }
       }
 
@@ -53,11 +116,6 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
 
       if (success) {
         navigate('/dashboard');
-      } else {
-        setError(mode === 'login' 
-          ? 'Invalid email or password'
-          : 'Failed to create account. Email might already exist.'
-        );
       }
     } catch (err) {
       setError(`An error occurred during ${mode}`);
