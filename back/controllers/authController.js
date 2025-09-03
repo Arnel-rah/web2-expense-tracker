@@ -20,16 +20,20 @@ export const signup = async (req, res) => {
     // Créer l'utilisateur
     const newUser = await createUser({ username, email, password: hashedPassword });
 
-    // Générer un token JWT (inscription--> connexion)
+    // Générer un token JWT (inscription --> connexion)
     const token = jwt.sign(
-      { id: newUser.user_id, email: newUser.email },
+      { userId: newUser.user_id, email: newUser.email }, // userId cohérent
       config.jwtSecret,
       { expiresIn: "1h" }
     );
 
     res.status(201).json({
       message: "Utilisateur créé avec succès",
-      user: { id: newUser.user_id, username: newUser.username, email: newUser.email },
+      user: {
+        userId: newUser.user_id, // uniforme avec le token
+        username: newUser.username,
+        email: newUser.email
+      },
       token
     });
   } catch (err) {
@@ -54,16 +58,20 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Email ou mot de passe incorrect" });
     }
 
-    // Générer un token JWT(connexion)
+    // Générer un token JWT (connexion)
     const token = jwt.sign(
-      { id: user.user_id, email: user.email },
+      { userId: user.user_id, email: user.email }, 
       config.jwtSecret,
       { expiresIn: "1h" }
     );
 
     res.json({
       message: "Connexion réussie",
-      user: { id: user.user_id, username: user.username, email: user.email },
+      user: {
+        userId: user.user_id, 
+        username: user.username,
+        email: user.email
+      },
       token
     });
   } catch (err) {
