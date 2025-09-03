@@ -14,7 +14,6 @@ const port = 8080;
 
 app.use(express.json());
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
 app.use(logRequest);
 app.use('/api/auth', authRouter);
 app.use('/api/expenses', expensesRouter);
