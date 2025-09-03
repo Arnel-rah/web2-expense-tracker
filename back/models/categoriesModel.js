@@ -36,7 +36,7 @@ export const updateCategoryDb = async (categoryId, userId, name) => {
 export const deleteCategoryDb = async (categoryId, userId) => {
   const result = await pool.query(
     `DELETE FROM categorie
-     WHERE id = $1 AND user_id = $2
+     WHERE category_id = $1 AND user_id = $2
      RETURNING *;`,
     [categoryId, userId]
   );
