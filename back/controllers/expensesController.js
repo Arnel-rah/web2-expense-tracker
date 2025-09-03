@@ -1,12 +1,9 @@
 import pool from '../config/database.js';
-import jwt from 'jsonwebtoken';
-import config from '../config/config.js';
 
 // Récupérer toutes les dépenses avec filtres
 export const getExpenses = async (req, res) => {
   const { start, end, category, type } = req.query;
-  const token = req.headers.authorization?.split(' ')[1];
-  const userId = jwt.verify(token, config.jwtSecret).user_id;
+  const userId = req.userId;
 
   let query = 'SELECT * FROM depense WHERE user_id = $1';
   const values = [userId];
@@ -32,14 +29,13 @@ export const getExpenses = async (req, res) => {
     const result = await pool.query(query, values);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ message: 'Error getting expenses' });
+    res.status(500).json({ message: 'Error getting expenses', error: error.message });
   }
 };
 
 // Récupérer une dépense par ID
 export const getExpenseById = async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  const userId = jwt.verify(token, config.jwtSecret).user_id;
+  const userId = req.userId;
   const query = 'SELECT * FROM depense WHERE expense_id = $1 AND user_id = $2';
 
   try {
@@ -47,17 +43,15 @@ export const getExpenseById = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Expense not found' });
     res.json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ message: 'Error getting expense' });
+    res.status(500).json({ message: 'Error getting expense', error: error.message });
   }
 };
 
 // Créer une dépense
 export const createExpense = async (req, res) => {
   const { amount, date, category_id, description, type, start_date, end_date } = req.body;
-  const token = req.headers.authorization?.split(' ')[1];
-  const userId = jwt.verify(token, config.jwtSecret).user_id;
+  const userId = req.userId;
 
-  // Insérer le reçu
   let receiptId = null;
   if (req.file) {
     const recuResult = await pool.query(
@@ -91,17 +85,15 @@ export const createExpense = async (req, res) => {
     const result = await pool.query(query, values);
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    res.status(400).json({ message: 'Error creating expense' });
+    res.status(400).json({ message: 'Error creating expense', error: error.message });
   }
 };
 
 // Mettre à jour une dépense
 export const updateExpense = async (req, res) => {
   const { amount, date, category_id, description, type, start_date, end_date } = req.body;
-  const token = req.headers.authorization?.split(' ')[1];
-  const userId = jwt.verify(token, config.jwtSecret).user_id;
+  const userId = req.userId;
 
-  // Vérifier si un nouveau fichier est uploadé
   let receiptId = null;
   if (req.file) {
     const recuResult = await pool.query(
@@ -143,14 +135,13 @@ export const updateExpense = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Expense not found' });
     res.json(result.rows[0]);
   } catch (error) {
-    res.status(400).json({ message: 'Error updating expense' });
+    res.status(400).json({ message: 'Error updating expense', error: error.message });
   }
 };
 
 // Supprimer une dépense
 export const deleteExpense = async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  const userId = jwt.verify(token, config.jwtSecret).user_id;
+  const userId = req.userId;
   const query = 'DELETE FROM depense WHERE expense_id = $1 AND user_id = $2 RETURNING *';
 
   try {
@@ -158,6 +149,6 @@ export const deleteExpense = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Expense not found' });
     res.status(204).json();
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting expense' });
+    res.status(500).json({ message: 'Error deleting expense', error: error.message });
   }
 };
