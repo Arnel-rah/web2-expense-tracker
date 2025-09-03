@@ -1,23 +1,27 @@
-//lister les catégories
-const getCategories = async (userId) =>{
-    const result = await pool.query(
+import pool from "../config/database.js";
+
+// Lister les catégories
+export const getCategoriesDb = async (userId) => {
+  const result = await pool.query(
     "SELECT * FROM categorie WHERE user_id = $1",
     [userId]
   );
+  return result.rows;
 };
 
-// créer une catégorie
-const createCategory = async (userId, name) =>{
-    const result = await pool.query(
+// Créer une catégorie
+export const createCategoryDb = async (userId, name) => {
+  const result = await pool.query(
     `INSERT INTO categorie(user_id, name)
-    VALUES ($1, $2)
-    RETURNING *;`
-    [userId, name]
+     VALUES ($1, $2)
+     RETURNING *;`,
+    [userId, name] 
   );
+  return result.rows[0];
 };
 
-//changer  le nom d'une catégorie
-const updateCategory = async (categoryId, userId, name) => {
+// Changer le nom d'une catégorie
+export const updateCategoryDb = async (categoryId, userId, name) => {
   const result = await pool.query(
     `UPDATE categorie 
      SET name = $1 
@@ -25,18 +29,16 @@ const updateCategory = async (categoryId, userId, name) => {
      RETURNING *;`,
     [name, categoryId, userId]
   );
-
-  return result.rows[0]; 
+  return result.rows[0];
 };
 
-//supprimer une catégorie
-const deleteCategory = async (categoryId, userId) => {
+// Supprimer une catégorie
+export const deleteCategoryDb = async (categoryId, userId) => {
   const result = await pool.query(
     `DELETE FROM categorie
      WHERE id = $1 AND user_id = $2
      RETURNING *;`,
     [categoryId, userId]
   );
-
-  return result.rows[0]; 
+  return result.rows[0];
 };
