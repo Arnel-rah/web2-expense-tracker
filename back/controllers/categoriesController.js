@@ -1,9 +1,9 @@
-import {
-  getCategoriesDb,
-  createCategoryDb,
-  updateCategoryDb,
-  deleteCategoryDb
-} from "../models/categoriesModel.js"; 
+import { 
+  getCategoriesDb, 
+  createCategoryDb, 
+  updateCategoryDb, 
+  deleteCategoryDb 
+} from '../models/categoriesModel.js'; 
 
 // Lister les catégories d’un utilisateur
 export const getCategories = async (req, res) => {
