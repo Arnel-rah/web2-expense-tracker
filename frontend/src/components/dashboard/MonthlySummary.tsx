@@ -173,7 +173,6 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   );
 };
 
-// Sous-composants pour améliorer la lisibilité
 const FinancialCard: React.FC<{
   title: string;
   amount: number;
