@@ -1,30 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from "../components/layout/Header";
 import MonthlySummary from '../components/dashboard/MonthlySummary';
 import Charts from '../components/dashboard/Charts';
 import Filters from '../components/dashboard/Filters';
 
-// Types
 interface Expense {
-  id: string;
+  id: number;
   amount: number;
-  category: string;
   date: string;
+  category_id: string;
+  description?: string | null;
   type: 'one-time' | 'recurring';
-  recurringType?: 'monthly' | 'weekly' | 'yearly';
+  start_date?: string | null;
+  end_date?: string | null;
+  receipt?: string | null;
+  user_id: number;
+  created_at?: string;
 }
 
 interface Income {
-  id: string;
+  id: number;
   amount: number;
   date: string;
   source: string;
+  description?: string | null;
+  user_id: number;
+  created_at?: string;
 }
 
 interface Category {
-  id: string;
+  id: number;
   name: string;
-  color: string;
+  user_id: number;
+  created_at?: string;
+  color?: string;
 }
 
 export default function Dashboard() {
@@ -39,34 +48,99 @@ export default function Dashboard() {
     const date = new Date();
     return date.toISOString().split('T')[0];
   });
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Définition des catégories
-  const categories: Category[] = [
-    { id: '1', name: 'Loyer', color: '#FF6384' },
-    { id: '2', name: 'Nourriture', color: '#36A2EB' },
-    { id: '3', name: 'Shopping', color: '#FFCE56' },
-    { id: '4', name: 'Transport', color: '#4BC0C0' },
-    { id: '5', name: 'Abonnements', color: '#9966FF' },
-    { id: '6', name: 'Santé', color: '#FF9F40' },
-    { id: '7', name: 'Éducation', color: '#8AC926' },
-    { id: '8', name: 'Loisirs', color: '#1982C4' },
-  ];
+  const API_URL = 'http://localhost:8080/api';
 
+  const categoriesWithColor = useMemo(() =>
+    categories.map(cat => ({
+      ...cat,
+      color: '#F59E0B'
+    })),
+    [categories]
+  );
+
+  const fetchCategory = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur de récupération des catégories');
+      }
+
+      const data = await response.json();
+      setCategories(data);
+      setSelectedCategories(data.map((cat: Category) => cat.name));
+      console.log('Categories:', data);
+
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
+  const fetchExpense = async () => {
+    try {
+      const response = await fetch(`${API_URL}/expenses`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur de récupération des dépenses');
+      }
+
+      const data = await response.json();
+      const formattedData = data.map((expense: any) => ({
+        ...expense,
+        amount: parseFloat(expense.amount)
+      }));
+      setExpenses(formattedData);
+      console.log('Expense:', formattedData);
+
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
+  const fetchIncome = async () => {
+    try {
+      const response = await fetch(`${API_URL}/incomes`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur de récupération des revenus');
+      }
+
+      const data = await response.json();
+      const formattedData = data.map((income: any) => ({
+        ...income,
+        amount: parseFloat(income.amount)
+      }));
+      setIncomes(formattedData);
+      console.log('Incomes:', formattedData);
+
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+  
   useEffect(() => {
-    // Données d'exemple
-    const sampleExpenses: Expense[] = [
-      { id: '2', amount: 801_000, category: 'Nourriture', date: '2025-08-05', type: 'one-time' },
-      { id: '3', amount: 50_001, category: 'Transport', date: '2025-08-10', type: 'one-time' }
-    ];
-
-    const sampleIncomes: Income[] = [
-      { id: '1', amount: 1_000_500, date: '2025-08-05', source: 'Salaire Principal' },
-    ];
-
-    setExpenses(sampleExpenses);
-    setIncomes(sampleIncomes);
+    fetchCategory();
+    fetchExpense();
+    fetchIncome();
   }, []);
 
   return (
@@ -88,7 +162,7 @@ export default function Dashboard() {
             onEndDateChange={setEndDate}
             selectedCategories={selectedCategories}
             onCategoriesChange={setSelectedCategories}
-            categories={categories}
+            categories={categoriesWithColor}
           />
 
           <div className="lg:col-span-3">
@@ -108,14 +182,13 @@ export default function Dashboard() {
           startDate={startDate}
           endDate={endDate}
           selectedCategories={selectedCategories}
-          categories={categories}
+          categories={categoriesWithColor}
         />
       </main>
     </div>
   );
 }
 
-// Sous-composants pour Dashboard
 const DashboardHeader: React.FC<{
   isFilterOpen: boolean;
   setIsFilterOpen: (open: boolean) => void;
@@ -128,7 +201,7 @@ const DashboardHeader: React.FC<{
 
     <button
       onClick={() => setIsFilterOpen(!isFilterOpen)}
-      className="lg:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200"
+      className="lg:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
     >
       <span className="text-gray-600">Filtres</span>
     </button>
