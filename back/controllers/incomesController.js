@@ -77,7 +77,7 @@ export const deleteIncome = async (req, res) => {
   try {
     const result = await pool.query(query, [req.params.id, userId]);
     if (result.rows.length === 0) return res.status(404).json({ message: 'Income not found' });
-    res.status(204).json();
+    res.status(200).json({ message: "Income deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting income' });
   }
