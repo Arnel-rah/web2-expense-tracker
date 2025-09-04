@@ -78,8 +78,6 @@ export default function Dashboard() {
       const data = await response.json();
       setCategories(data);
       setSelectedCategories(data.map((cat: Category) => cat.name));
-      console.log('Categories:', data);
-
     } catch (error) {
       console.error('Erreur:', error);
     }
@@ -104,8 +102,6 @@ export default function Dashboard() {
         amount: parseFloat(expense.amount)
       }));
       setExpenses(formattedData);
-      console.log('Expense:', formattedData);
-
     } catch (error) {
       console.error('Erreur:', error);
     }
@@ -130,8 +126,6 @@ export default function Dashboard() {
         amount: parseFloat(income.amount)
       }));
       setIncomes(formattedData);
-      console.log('Incomes:', formattedData);
-
     } catch (error) {
       console.error('Erreur:', error);
     }
