@@ -162,7 +162,7 @@ const Charts: React.FC<ChartsProps> = ({
             const value = context.raw || 0;
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = ((value / total) * 100).toFixed(1);
-            return `${label}: Ar ${value.toFixed(2)} (${percentage}%)`;
+            return `${label}: Ar ${value} (${percentage}%)`;
           }
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -342,7 +342,7 @@ const CategoryDetails: React.FC<{
               />
               <span className="text-gray-600">{category}</span>
             </div>
-            <span className="font-medium text-gray-900">Ar {(amount as number).toFixed(2)}</span>
+            <span className="font-medium text-gray-900">Ar {(amount as number)}</span>
           </li>
         ))}
     </ul>
@@ -381,7 +381,7 @@ const StatCard: React.FC<{
 }> = ({ title, value, bgColor, textColor, valueColor, fullWidth = false }) => (
   <div className={`${bgColor} p-3 rounded ${fullWidth ? 'col-span-2' : ''}`}>
     <div className={`${textColor} font-semibold`}>{title}</div>
-    <div className={`${valueColor} font-bold text-lg`}>Ar {value.toFixed(2)}</div>
+    <div className={`${valueColor} font-bold text-lg`}>Ar {value}</div>
   </div>
 );
 

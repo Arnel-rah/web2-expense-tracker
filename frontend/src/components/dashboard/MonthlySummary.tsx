@@ -185,7 +185,7 @@ const FinancialCard: React.FC<{
 }> = ({ title, amount, count, gradient, border, textColor, amountColor, itemName }) => (
   <div className={`bg-gradient-to-br ${gradient} p-4 rounded-xl border ${border}`}>
     <h3 className={`text-sm font-semibold ${textColor} mb-2`}>{title}</h3>
-    <p className={`text-2xl font-bold ${amountColor}`}>Ar {amount.toFixed(2)}</p>
+    <p className={`text-2xl font-bold ${amountColor}`}>Ar {amount}</p>
     <div className={`mt-2 text-xs ${textColor}`}>
       {count} {itemName}{count !== 1 ? 's' : ''}
     </div>
@@ -214,7 +214,7 @@ const BalanceCard: React.FC<{
   return (
     <div className={`p-4 rounded-xl border ${theme.gradient} ${theme.border}`}>
       <h3 className={`text-sm font-semibold mb-2 ${theme.text}`}>Solde</h3>
-      <p className={`text-2xl font-bold ${theme.amount}`}>Ar {balance.toFixed(2)}</p>
+      <p className={`text-2xl font-bold ${theme.amount}`}>Ar {balance}</p>
       <div className={`mt-2 text-xs px-2 py-1 rounded-full inline-block ${theme.badge}`}>
         {isPositive ? `${savingsRate.toFixed(1)}% d'épargne` : 'Déficit budgétaire'}
       </div>
@@ -249,7 +249,7 @@ const LargestExpenseCard: React.FC<{
   <div className="bg-gray-50 p-3 rounded-xl">
     <div className="flex items-center justify-between text-sm mb-1">
       <span className="text-gray-600 font-medium">Plus grande dépense</span>
-      <span className="font-semibold text-red-600">Ar {expense.amount.toFixed(2)}</span>
+      <span className="font-semibold text-red-600">Ar {expense.amount}</span>
     </div>
     <p className="text-xs text-gray-500 truncate">
       {expense.category_id} - {new Date(expense.date).toLocaleDateString('fr-FR')}
@@ -286,13 +286,13 @@ const BudgetAlert: React.FC<{
           </div>
           <p className="text-xs mt-1">
             {isOverBudget ? (
-              <>Vous avez dépassé votre budget de <strong>Ar {overBudgetAmount.toFixed(2)}</strong></>
+              <>Vous avez dépassé votre budget de <strong>Ar {overBudgetAmount}</strong></>
             ) : (
               <>Vos dépenses représentent <strong>{expensePercentage.toFixed(1)}%</strong> de vos revenus</>
             )}
           </p>
           <div className="text-xs opacity-80 mt-1">
-            Revenus: ${totalIncome.toFixed(2)} | Dépenses: Ar {totalExpenses.toFixed(2)}
+            Revenus: ${totalIncome} | Dépenses: Ar {totalExpenses}
           </div>
         </div>
       </div>
