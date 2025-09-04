@@ -24,13 +24,15 @@ ChartJS.register(
 );
 
 interface Category {
-  id: string;
+  id: number;
   name: string;
-  color: string;
+  user_id: number;
+  created_at?: string;
+  color?: string;
 }
 
 interface FinancialItem {
-  id: string;
+  id: number;
   amount: number;
   date: string;
   category?: string;
@@ -56,7 +58,7 @@ const Charts: React.FC<ChartsProps> = ({
   const { periodIncome, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     // Calcul des données de période
     const periodIncome = incomes
       .filter(income => {
@@ -117,9 +119,9 @@ const Charts: React.FC<ChartsProps> = ({
 
   // Configuration des graphiques
   const doughnutData = useMemo(() => {
-    const getCategoryColor = (categoryName: string) => {
+    const getCategoryColor = (categoryName: string): string => {
       const category = categories.find(c => c.name === categoryName);
-      return category ? category.color : '#CCCCCC';
+      return category?.color || '#CCCCCC'; // Always returns a string
     };
 
     return {
@@ -160,7 +162,7 @@ const Charts: React.FC<ChartsProps> = ({
             const value = context.raw || 0;
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = ((value / total) * 100).toFixed(1);
-            return `${label}: $${value.toFixed(2)} (${percentage}%)`;
+            return `${label}: Ar ${value.toFixed(2)} (${percentage}%)`;
           }
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -228,7 +230,7 @@ const Charts: React.FC<ChartsProps> = ({
         displayColors: true,
         callbacks: {
           label: function (context: any) {
-            return `${context.dataset.label}: $${context.raw.toFixed(2)}`;
+            return `${context.dataset.label}: Ar ${context.raw.toFixed(2)}`;
           }
         }
       }
@@ -238,7 +240,7 @@ const Charts: React.FC<ChartsProps> = ({
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Montant ($)',
+          text: 'Montant (Ar)',
           font: { size: 12 }
         },
         grid: { color: 'rgba(0, 0, 0, 0.1)' }
@@ -304,10 +306,10 @@ const Charts: React.FC<ChartsProps> = ({
             )}
           </div>
 
-          <PeriodStats 
-            periodIncome={periodIncome} 
-            periodExpenses={periodExpenses} 
-            periodBalance={periodBalance} 
+          <PeriodStats
+            periodIncome={periodIncome}
+            periodExpenses={periodExpenses}
+            periodBalance={periodBalance}
           />
         </div>
       </div>
@@ -324,7 +326,7 @@ const NoDataMessage: React.FC<{ message: string }> = ({ message }) => (
 
 const CategoryDetails: React.FC<{
   categoryData: Record<string, number>;
-  getCategoryColor: (name: string) => string;
+  getCategoryColor: (name: string) => string | undefined;
 }> = ({ categoryData, getCategoryColor }) => (
   <div className="mt-4 p-4 bg-gray-50 rounded-lg">
     <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Détails par catégorie</h4>
@@ -340,7 +342,7 @@ const CategoryDetails: React.FC<{
               />
               <span className="text-gray-600">{category}</span>
             </div>
-            <span className="font-medium text-gray-900">${(amount as number).toFixed(2)}</span>
+            <span className="font-medium text-gray-900">Ar {(amount as number).toFixed(2)}</span>
           </li>
         ))}
     </ul>
@@ -357,13 +359,13 @@ const PeriodStats: React.FC<{
     <div className="grid grid-cols-2 gap-3 text-sm">
       <StatCard title="Revenus" value={periodIncome} bgColor="bg-green-100" textColor="text-green-800" valueColor="text-green-900" />
       <StatCard title="Dépenses" value={periodExpenses} bgColor="bg-red-100" textColor="text-red-800" valueColor="text-red-900" />
-      <StatCard 
-        title="Solde Final" 
-        value={periodBalance} 
-        bgColor={periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'} 
-        textColor={periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'} 
-        valueColor={periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} 
-        fullWidth 
+      <StatCard
+        title="Solde Final"
+        value={periodBalance}
+        bgColor={periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'}
+        textColor={periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'}
+        valueColor={periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'}
+        fullWidth
       />
     </div>
   </div>
@@ -379,7 +381,7 @@ const StatCard: React.FC<{
 }> = ({ title, value, bgColor, textColor, valueColor, fullWidth = false }) => (
   <div className={`${bgColor} p-3 rounded ${fullWidth ? 'col-span-2' : ''}`}>
     <div className={`${textColor} font-semibold`}>{title}</div>
-    <div className={`${valueColor} font-bold text-lg`}>${value.toFixed(2)}</div>
+    <div className={`${valueColor} font-bold text-lg`}>Ar {value.toFixed(2)}</div>
   </div>
 );
 
