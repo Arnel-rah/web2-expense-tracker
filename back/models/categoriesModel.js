@@ -25,7 +25,7 @@ export const updateCategoryDb = async (categoryId, userId, name) => {
   const result = await pool.query(
     `UPDATE categorie 
      SET name = $1 
-     WHERE id = $2 AND user_id = $3
+     WHERE category_id = $2 AND user_id = $3
      RETURNING *;`,
     [name, categoryId, userId]
   );
@@ -36,7 +36,7 @@ export const updateCategoryDb = async (categoryId, userId, name) => {
 export const deleteCategoryDb = async (categoryId, userId) => {
   const result = await pool.query(
     `DELETE FROM categorie
-     WHERE id = $1 AND user_id = $2
+     WHERE category_id = $1 AND user_id = $2
      RETURNING *;`,
     [categoryId, userId]
   );
