@@ -3,198 +3,79 @@ import Header from "../components/layout/Header";
 import MonthlySummary from '../components/dashboard/MonthlySummary';
 import Charts from '../components/dashboard/Charts';
 import Filters from '../components/dashboard/Filters';
+import type { Expense, Income, Category, FiltersProps } from '../types/MonthlySummary.types';
 
-interface Expense {
-  id: number;
-  amount: number;
-  date: string;
-  category_id: string;
-  description?: string | null;
-  type: 'one-time' | 'recurring';
-  start_date?: string | null;
-  end_date?: string | null;
-  receipt?: string | null;
-  user_id: number;
-  created_at?: string;
-}
+const API_URL = 'http://localhost:8080/api';
 
-interface Income {
-  id: number;
-  amount: number;
-  date: string;
-  source: string;
-  description?: string | null;
-  user_id: number;
-  created_at?: string;
-}
+const getDefaultDateRange = () => ({
+  start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+  end: new Date().toISOString().split('T')[0]
+});
 
-interface Category {
-  id: number;
-  name: string;
-  user_id: number;
-  created_at?: string;
-  color?: string;
-}
+const createAuthHeaders = () => ({
+  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+});
 
-export default function Dashboard() {
+const useApiData = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
-  const [startDate, setStartDate] = useState<string>(() => {
-    const date = new Date();
-    date.setDate(1);
-    return date.toISOString().split('T')[0];
-  });
-  const [endDate, setEndDate] = useState<string>(() => {
-    const date = new Date();
-    return date.toISOString().split('T')[0];
-  });
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const API_URL = 'http://localhost:8080/api';
-
-  const categoriesWithColor = useMemo(() =>
-    categories.map(cat => ({
-      ...cat,
-      color: '#F59E0B'
-    })),
-    [categories]
-  );
-
-  const fetchCategory = async () => {
-    try {
-      const response = await fetch(`${API_URL}/categories`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur de récupération des catégories');
-      }
-
-      const data = await response.json();
-      setCategories(data);
-      setSelectedCategories(data.map((cat: Category) => cat.name));
-    } catch (error) {
-      console.error('Erreur:', error);
+  const fetchData = async (endpoint: string) => {
+    const response = await fetch(`${API_URL}/${endpoint}`, {
+      method: 'GET',
+      headers: createAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Erreur de récupération des ${endpoint}`);
     }
+    
+    return response.json();
   };
 
-  const fetchExpense = async () => {
+  const loadAllData = async () => {
     try {
-      const response = await fetch(`${API_URL}/expenses`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
-      });
+      const [categoriesData, expensesData, incomesData] = await Promise.all([
+        fetchData('categories'),
+        fetchData('expenses'),
+        fetchData('incomes')
+      ]);
 
-      if (!response.ok) {
-        throw new Error('Erreur de récupération des dépenses');
-      }
-
-      const data = await response.json();
-      const formattedData = data.map((expense: any) => ({
+      setCategories(categoriesData);
+      setExpenses(expensesData.map((expense: any) => ({
         ...expense,
         amount: parseFloat(expense.amount)
-      }));
-      setExpenses(formattedData);
-    } catch (error) {
-      console.error('Erreur:', error);
-    }
-  };
-
-  const fetchIncome = async () => {
-    try {
-      const response = await fetch(`${API_URL}/incomes`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur de récupération des revenus');
-      }
-
-      const data = await response.json();
-      const formattedData = data.map((income: any) => ({
+      })));
+      setIncomes(incomesData.map((income: any) => ({
         ...income,
         amount: parseFloat(income.amount)
-      }));
-      setIncomes(formattedData);
+      })));
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur de chargement des données:', error);
     }
   };
-  
+
   useEffect(() => {
-    fetchCategory();
-    fetchExpense();
-    fetchIncome();
+    loadAllData();
   }, []);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <Header />
+  return { expenses, incomes, categories };
+};
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <DashboardHeader
-          isFilterOpen={isFilterOpen}
-          setIsFilterOpen={setIsFilterOpen}
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-          <FilterSection
-            isFilterOpen={isFilterOpen}
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-            selectedCategories={selectedCategories}
-            onCategoriesChange={setSelectedCategories}
-            categories={categoriesWithColor}
-          />
-
-          <div className="lg:col-span-3">
-            <MonthlySummary
-              expenses={expenses}
-              incomes={incomes}
-              startDate={startDate}
-              endDate={endDate}
-              selectedCategories={selectedCategories}
-            />
-          </div>
-        </div>
-
-        <Charts
-          expenses={expenses}
-          incomes={incomes}
-          startDate={startDate}
-          endDate={endDate}
-          selectedCategories={selectedCategories}
-          categories={categoriesWithColor}
-        />
-      </main>
-    </div>
-  );
-}
-
-const DashboardHeader: React.FC<{
-  isFilterOpen: boolean;
-  setIsFilterOpen: (open: boolean) => void;
-}> = ({ isFilterOpen, setIsFilterOpen }) => (
+const DashboardHeader = ({
+  onToggleFilter 
+}: { 
+  isFilterOpen: boolean; 
+  onToggleFilter: () => void; 
+}) => (
   <div className="mb-8 flex justify-between items-center">
     <div>
       <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord Financier</h1>
       <p className="text-gray-600 mt-2">Visualisez et analysez vos finances personnelles</p>
     </div>
-
     <button
-      onClick={() => setIsFilterOpen(!isFilterOpen)}
+      onClick={onToggleFilter}
       className="lg:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
     >
       <span className="text-gray-600">Filtres</span>
@@ -202,25 +83,87 @@ const DashboardHeader: React.FC<{
   </div>
 );
 
-const FilterSection: React.FC<{
-  isFilterOpen: boolean;
-  startDate: string;
-  endDate: string;
-  onStartDateChange: (date: string) => void;
-  onEndDateChange: (date: string) => void;
-  selectedCategories: string[];
-  onCategoriesChange: (categories: string[]) => void;
-  categories: Category[];
-}> = (props) => (
+const FilterSection = ({ 
+  isOpen, 
+  filterProps
+}: { 
+  isOpen: boolean; 
+  filterProps: FiltersProps;
+}) => (
   <>
     <div className="hidden lg:block lg:col-span-1">
-      <Filters {...props} />
+      <Filters {...filterProps} />
     </div>
-
-    {props.isFilterOpen && (
+    {isOpen && (
       <div className="lg:hidden col-span-1">
-        <Filters {...props} />
+        <Filters {...filterProps} />
       </div>
     )}
   </>
 );
+
+export default function Dashboard() {
+  const { expenses, incomes, categories } = useApiData();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  const defaultDates = getDefaultDateRange();
+  const [startDate, setStartDate] = useState(defaultDates.start);
+  const [endDate, setEndDate] = useState(defaultDates.end);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setSelectedCategories(categories.map(cat => cat.name));
+    }
+  }, [categories]);
+
+  const categoriesWithColor = useMemo(() =>
+    categories.map(cat => ({ ...cat, color: '#F59E0B' })),
+    [categories]
+  );
+
+  const filterProps: FiltersProps = {
+    startDate,
+    endDate,
+    onStartDateChange: setStartDate,
+    onEndDateChange: setEndDate,
+    selectedCategories,
+    onCategoriesChange: setSelectedCategories,
+    categories: categoriesWithColor
+  };
+
+  const dataProps = {
+    expenses,
+    incomes,
+    startDate,
+    endDate,
+    selectedCategories,
+    categories: categoriesWithColor
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <Header />
+      
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <DashboardHeader
+          isFilterOpen={isFilterOpen}
+          onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+          <FilterSection 
+            isOpen={isFilterOpen} 
+            filterProps={filterProps} 
+          />
+          
+          <div className="lg:col-span-3">
+            <MonthlySummary {...dataProps} />
+          </div>
+        </div>
+
+        <Charts {...dataProps} />
+      </main>
+    </div>
+  );
+}

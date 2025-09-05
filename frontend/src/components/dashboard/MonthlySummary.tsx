@@ -1,29 +1,87 @@
 import { faChartPie, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useMemo } from 'react';
+import type { FinancialItem, MonthlySummaryProps } from '../../types/MonthlySummary.types.ts';
+import { createDateRange, isInDateRange, formatPeriod } from '../../utils/utils.ts';
 
-interface FinancialItem {
-  id: number;
+const themes = {
+  green: 'from-green-200 to-green-200 border-green-300 text-green-900 text-green-900',
+  red: 'from-red-200 to-red-200 border-red-300 text-red-900 text-red-900',
+  blue: 'from-blue-200 to-blue-200 border-blue-300 text-blue-900 text-blue-900',
+  orange: 'from-orange-200 to-orange-200 border-orange-300 text-orange-900 text-orange-900',
+  yellow: 'bg-yellow-50 border-yellow-200 text-yellow-900 text-yellow-600',
+  alert: 'bg-red-50 border-red-200 text-red-900 text-red-600',
+};
+
+const FinancialCard = ({ title, amount, count, theme, itemName, children, tooltip }: {
+  title: string;
   amount: number;
-  date: string;
-  category?: string;
-  category_id?: string
-}
+  count?: number;
+  theme: keyof typeof themes;
+  itemName?: string;
+  children?: React.ReactNode;
+  tooltip?: string;
+}) => {
+  const [gradient, , textColor, amountColor] = themes[theme].split(' ');
+  return (
+    <div
+      className={`bg-gradient-to-br ${gradient} p-5 rounded-xl hover:shadow-md transition-shadow duration-200 group relative`}
+      title={tooltip}
+    >
+      <h3 className={`text-base font-semibold ${textColor} mb-3`}>{title}</h3>
+      <p className={`text-3xl font-bold ${amountColor}`}>Ar {amount.toLocaleString('fr-FR')}</p>
+      {children || (count !== undefined && itemName && (
+        <div className={`mt-3 text-sm ${textColor}`}>
+          {count} {itemName}{count !== 1 ? 's' : ''}
+        </div>
+      ))}
+    </div>
+  );
+};
 
-interface MonthlySummaryProps {
-  expenses: FinancialItem[];
-  incomes: FinancialItem[];
-  startDate: string;
-  endDate: string;
-  selectedCategories: string[];
-}
+const useFinancialCalculations = (
+  expenses: FinancialItem[],
+  incomes: FinancialItem[],
+  startDate: string,
+  endDate: string,
+  selectedCategories: string[]
+) => useMemo(() => {
+  const { start, end } = createDateRange(startDate, endDate);
+  const filteredIncomes = incomes.filter(income => isInDateRange(income.date, start, end));
+  const filteredExpenses = expenses.filter(expense =>
+    isInDateRange(expense.date, start, end) &&
+    (selectedCategories.length === 0 || (expense.category_id && selectedCategories.includes(expense.category_id)))
+  );
+
+  const totalIncome = filteredIncomes.reduce((sum, { amount }) => sum + amount, 0);
+  const totalExpenses = filteredExpenses.reduce((sum, { amount }) => sum + amount, 0);
+  const balance = totalIncome - totalExpenses;
+  const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+  const expenseRate = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+  const largestExpense = filteredExpenses.length > 0
+    ? filteredExpenses.reduce((max, expense) => expense.amount > max.amount ? expense : max, filteredExpenses[0])
+    : null;
+
+  return {
+    filteredIncomes,
+    filteredExpenses,
+    totalIncome,
+    totalExpenses,
+    balance,
+    savingsRate,
+    expenseRate,
+    largestExpense,
+    isOverBudget: totalExpenses > totalIncome,
+    overBudgetAmount: Math.max(0, totalExpenses - totalIncome),
+  };
+}, [expenses, incomes, startDate, endDate, selectedCategories]);
 
 const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   expenses,
   incomes,
   startDate,
   endDate,
-  selectedCategories
+  selectedCategories,
 }) => {
   const {
     filteredIncomes,
@@ -32,281 +90,100 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
     totalExpenses,
     balance,
     savingsRate,
+    expenseRate,
     largestExpense,
     isOverBudget,
     overBudgetAmount,
-    expensePercentage
-  } = useMemo(() => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    start.setHours(0, 0, 0, 0)
-    end.setHours(23, 59, 59, 999);
-
-    console.log(start.getDate);
-    
-    const filteredIncomes = incomes.filter(income => {
-      const incomeDate = new Date(income.date);
-      return incomeDate >= start && incomeDate <= end;
-    });
-
-    const filteredExpenses = expenses.filter(expense => {
-      const expenseDate = new Date(expense.date);
-      const matchesPeriod = expenseDate >= start && expenseDate <= end;
-
-      const matchesCategory = selectedCategories.length === 0 ||
-        (expense.category_id && selectedCategories.includes(expense.category_id));
-
-      return matchesPeriod && matchesCategory;
-    });
-
-    // console.log(
-    //   expenses.filter(
-    //     (expense) => {
-    //       return expense.date.includes(start.toDateString)
-    //     }
-    //   )
-    // );
-    
-    const totalIncome = filteredIncomes.reduce((sum, income) => sum + income.amount, 0);
-    const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const balance = totalIncome - totalExpenses;
-    const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
-
-    const largestExpense = filteredExpenses.length > 0
-      ? filteredExpenses.reduce((max, expense) =>
-        expense.amount > max.amount ? expense : max, filteredExpenses[0])
-      : null;
-
-    // Calcul des alertes budgétaires
-    const isOverBudget = totalExpenses > totalIncome;
-    const overBudgetAmount = totalExpenses - totalIncome;
-    const expensePercentage = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
-
-    return {
-      filteredIncomes,
-      filteredExpenses,
-      totalIncome,
-      totalExpenses,
-      balance,
-      savingsRate,
-      largestExpense,
-      isOverBudget,
-      overBudgetAmount,
-      expensePercentage
-    };
-  }, [expenses, incomes, startDate, endDate, selectedCategories]);
-
-  const formatPeriod = () => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (start.toDateString() === end.toDateString()) {
-      return start.toLocaleDateString('fr-FR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-    }
-
-    return `${start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${end.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-  };
-
-  const expenseRate = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
-  const expenseRateColor = totalExpenses > totalIncome ? '#ef4444' :
-    expenseRate > 84 ? '#f59e0b' : '#10b981';
-
-  const showBudgetAlert = isOverBudget || expensePercentage > 84;
+  } = useFinancialCalculations(expenses, incomes, startDate, endDate, selectedCategories);
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 h-full">
-      <div className="flex items-center justify-between mb-6">
-        <div className='flex items-center gap-2'>
-          <FontAwesomeIcon icon={faChartPie} className="text-gray-700" />
-          <h2 className="text-xl font-semibold text-gray-900">Résumé Financier</h2>
+    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 h-full">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <FontAwesomeIcon icon={faChartPie} className="text-gray-600 text-lg" />
+          <h2 className="text-2xl font-bold text-gray-900">Résumé Financier</h2>
         </div>
-        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-          {formatPeriod()}
+        <span className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-full">
+          {formatPeriod(startDate, endDate)}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <FinancialCard
           title="Revenus"
           amount={totalIncome}
           count={filteredIncomes.length}
-          gradient="from-green-50 to-green-100"
-          border="border-green-200"
-          textColor="text-green-800"
-          amountColor="text-green-900"
+          theme="green"
           itemName="source"
+          tooltip="Total des revenus pour la période sélectionnée"
         />
-
         <FinancialCard
           title="Dépenses"
           amount={totalExpenses}
           count={filteredExpenses.length}
-          gradient="from-red-50 to-red-100"
-          border="border-red-200"
-          textColor="text-red-800"
-          amountColor="text-red-900"
+          theme="red"
           itemName="dépense"
+          tooltip="Total des dépenses pour la période sélectionnée"
         />
-
-        <BalanceCard
-          balance={balance}
-          savingsRate={savingsRate}
-        />
+        <FinancialCard
+          title="Solde"
+          amount={balance}
+          theme={balance >= 0 ? 'blue' : 'orange'}
+          tooltip={balance >= 0 ? 'Solde positif (épargne)' : 'Solde négatif (déficit)'}
+        >
+          <div className={`mt-3 text-sm px-3 py-1 rounded-full inline-block ${balance >= 0 ? 'text-blue-800 bg-blue-200/50' : 'text-orange-800 bg-orange-200/50'}`}>
+            {balance >= 0 ? `${savingsRate.toFixed(1)}% d'épargne` : 'Déficit budgétaire'}
+          </div>
+        </FinancialCard>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <ExpenseRateBar
-          expenseRate={expenseRate}
-          expenseRateColor={expenseRateColor}
-        />
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="bg-gray-50 p-4 rounded-xl group hover:shadow-md transition-shadow duration-200" title="Pourcentage des revenus dépensés">
+          <div className="flex items-center justify-between text-base mb-3">
+            <span className="text-gray-600 font-semibold">Taux de dépenses</span>
+            <span className="font-semibold">{expenseRate.toFixed(1)}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div
+              className="h-3 rounded-full transition-all duration-500"
+              style={{
+                width: `${Math.min(expenseRate, 100)}%`,
+                backgroundColor: expenseRate > 100 ? '#ef4444' : expenseRate > 84 ? '#f59e0b' : '#10b981',
+              }}
+            />
+          </div>
+        </div>
         {largestExpense && (
-          <LargestExpenseCard expense={largestExpense} />
+          <div className="bg-gray-50 p-4 rounded-xl group hover:shadow-md transition-shadow duration-200" title="Dépense la plus importante">
+            <div className="flex items-center justify-between text-base mb-2">
+              <span className="text-gray-600 font-semibold">Plus grande dépense</span>
+              <span className="font-semibold text-red-600">Ar {largestExpense.amount.toLocaleString('fr-FR')}</span>
+            </div>
+            <p className="text-sm text-gray-500 truncate">
+              {largestExpense.category_id} - {new Date(largestExpense.date).toLocaleDateString('fr-FR')}
+            </p>
+          </div>
         )}
       </div>
 
-      {/* Alerte budgétaire intégrée */}
-      {showBudgetAlert && (
-        <BudgetAlert
-          isOverBudget={isOverBudget}
-          overBudgetAmount={overBudgetAmount}
-          expensePercentage={expensePercentage}
-          totalIncome={totalIncome}
-          totalExpenses={totalExpenses}
-        />
-      )}
-    </div>
-  );
-};
-
-const FinancialCard: React.FC<{
-  title: string;
-  amount: number;
-  count: number;
-  gradient: string;
-  border: string;
-  textColor: string;
-  amountColor: string;
-  itemName: string;
-}> = ({ title, amount, count, gradient, border, textColor, amountColor, itemName }) => (
-  <div className={`bg-gradient-to-br ${gradient} p-4 rounded-xl border ${border}`}>
-    <h3 className={`text-sm font-semibold ${textColor} mb-2`}>{title}</h3>
-    <p className={`text-2xl font-bold ${amountColor}`}>Ar {amount}</p>
-    <div className={`mt-2 text-xs ${textColor}`}>
-      {count} {itemName}{count !== 1 ? 's' : ''}
-    </div>
-  </div>
-);
-
-const BalanceCard: React.FC<{
-  balance: number;
-  savingsRate: number;
-}> = ({ balance, savingsRate }) => {
-  const isPositive = balance >= 0;
-  const theme = isPositive ? {
-    gradient: 'from-blue-50 to-blue-100',
-    border: 'border-blue-200',
-    text: 'text-blue-800',
-    amount: 'text-blue-900',
-    badge: 'text-blue-700 bg-blue-200/50'
-  } : {
-    gradient: 'from-orange-50 to-orange-100',
-    border: 'border-orange-200',
-    text: 'text-orange-800',
-    amount: 'text-orange-900',
-    badge: 'text-orange-700 bg-orange-200/50'
-  };
-
-  return (
-    <div className={`p-4 rounded-xl border ${theme.gradient} ${theme.border}`}>
-      <h3 className={`text-sm font-semibold mb-2 ${theme.text}`}>Solde</h3>
-      <p className={`text-2xl font-bold ${theme.amount}`}>Ar {balance}</p>
-      <div className={`mt-2 text-xs px-2 py-1 rounded-full inline-block ${theme.badge}`}>
-        {isPositive ? `${savingsRate.toFixed(1)}% d'épargne` : 'Déficit budgétaire'}
-      </div>
-    </div>
-  );
-};
-
-const ExpenseRateBar: React.FC<{
-  expenseRate: number;
-  expenseRateColor: string;
-}> = ({ expenseRate, expenseRateColor }) => (
-  <div className="bg-gray-50 p-3 rounded-xl">
-    <div className="flex items-center justify-between text-sm mb-2">
-      <span className="text-gray-600 font-medium">Taux de dépenses</span>
-      <span className="font-semibold">{expenseRate.toFixed(1)}%</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
-      <div
-        className="h-2.5 rounded-full transition-all duration-500"
-        style={{
-          width: `${Math.min(expenseRate, 100)}%`,
-          backgroundColor: expenseRateColor
-        }}
-      />
-    </div>
-  </div>
-);
-
-const LargestExpenseCard: React.FC<{
-  expense: FinancialItem;
-}> = ({ expense }) => (
-  <div className="bg-gray-50 p-3 rounded-xl">
-    <div className="flex items-center justify-between text-sm mb-1">
-      <span className="text-gray-600 font-medium">Plus grande dépense</span>
-      <span className="font-semibold text-red-600">Ar {expense.amount}</span>
-    </div>
-    <p className="text-xs text-gray-500 truncate">
-      {expense.category_id} - {new Date(expense.date).toLocaleDateString('fr-FR')}
-    </p>
-  </div>
-);
-
-const BudgetAlert: React.FC<{
-  isOverBudget: boolean;
-  overBudgetAmount: number;
-  expensePercentage: number;
-  totalIncome: number;
-  totalExpenses: number;
-}> = ({ isOverBudget, overBudgetAmount, expensePercentage, totalIncome, totalExpenses }) => {
-  const alertType = isOverBudget ? {
-    bg: 'bg-red-100',
-    border: 'border-red-200',
-    text: 'text-red-800',
-    icon: 'text-red-500'
-  } : {
-    bg: 'bg-yellow-100',
-    border: 'border-yellow-200',
-    text: 'text-yellow-800',
-    icon: 'text-yellow-500'
-  };
-
-  return (
-    <div className={`p-3 rounded-xl border ${alertType.bg} ${alertType.border} ${alertType.text}`}>
-      <div className="flex items-start">
-        <FontAwesomeIcon icon={faExclamationTriangle} className={`w-4 h-4 mt-0.5 mr-2 ${alertType.icon}`} />
-        <div className="flex-1">
-          <div className="font-medium text-sm">
-            {isOverBudget ? 'Dépassement de budget !' : 'Attention au budget'}
-          </div>
-          <p className="text-xs mt-1">
-            {isOverBudget ? (
-              <>Vous avez dépassé votre budget de <strong>Ar {overBudgetAmount}</strong></>
-            ) : (
-              <>Vos dépenses représentent <strong>{expensePercentage.toFixed(1)}%</strong> de vos revenus</>
-            )}
-          </p>
-          <div className="text-xs opacity-80 mt-1">
-            Revenus: ${totalIncome} | Dépenses: Ar {totalExpenses}
+      {(isOverBudget || expenseRate > 84) && (
+        <div className={`p-4 rounded-xl border ${themes[isOverBudget ? 'alert' : 'yellow']} group hover:shadow-md transition-shadow duration-200`} title="Alerte budgétaire">
+          <div className="flex items-start">
+            <FontAwesomeIcon icon={faExclamationTriangle} className={`w-5 h-5 mt-0.5 mr-3 ${themes[isOverBudget ? 'alert' : 'yellow'].split(' ')[3]}`} />
+            <div className="flex-1">
+              <div className="font-semibold text-base">{isOverBudget ? 'Dépassement de budget !' : 'Attention au budget'}</div>
+              <p className="text-sm mt-1">
+                {isOverBudget
+                  ? `Vous avez dépassé votre budget de Ar ${overBudgetAmount.toLocaleString('fr-FR')}`
+                  : `Vos dépenses représentent ${expenseRate.toFixed(1)}% de vos revenus`}
+              </p>
+              <div className="text-sm opacity-80 mt-2">
+                Revenus: Ar {totalIncome.toLocaleString('fr-FR')} | Dépenses: Ar {totalExpenses.toLocaleString('fr-FR')}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -12,31 +12,9 @@ import {
 } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons';
+import type { Category, FinancialItem } from '../../types/MonthlySummary.types';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-interface Category {
-  id: number;
-  name: string;
-  user_id: number;
-  created_at?: string;
-  color?: string;
-}
-
-interface FinancialItem {
-  id: number;
-  amount: number;
-  date: string;
-  category?: string;
-}
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 interface ChartsProps {
   expenses: FinancialItem[];
@@ -47,19 +25,11 @@ interface ChartsProps {
   categories: Category[];
 }
 
-const Charts: React.FC<ChartsProps> = ({
-  expenses,
-  incomes,
-  startDate,
-  endDate,
-  selectedCategories,
-  categories
-}) => {
+const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, selectedCategories, categories }) => {
   const { periodIncome, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    // Calcul des données de période
     const periodIncome = incomes
       .filter(income => {
         const incomeDate = new Date(income.date);
@@ -71,35 +41,30 @@ const Charts: React.FC<ChartsProps> = ({
       .filter(expense => {
         const expenseDate = new Date(expense.date);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
-        const matchesCategory = selectedCategories.length === 0 ||
-          (expense.category && selectedCategories.includes(expense.category));
+        const matchesCategory = selectedCategories.length === 0 || 
+          (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
       .reduce((sum, expense) => sum + expense.amount, 0);
 
-    const periodBalance = periodIncome - periodExpenses;
-
-    // Données pour le graphique circulaire
     const categoryData = expenses
       .filter(expense => {
         const expenseDate = new Date(expense.date);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
-        const matchesCategory = selectedCategories.length === 0 ||
-          (expense.category && selectedCategories.includes(expense.category));
+        const matchesCategory = selectedCategories.length === 0 || 
+          (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
       .reduce((acc, expense) => {
-        if (expense.category) {
-          acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+        if (expense.category_id) {
+          acc[expense.category_id] = (acc[expense.category_id] || 0) + expense.amount;
         }
         return acc;
       }, {} as Record<string, number>);
 
-    // Données pour le graphique en barres (6 derniers mois)
     const getLastSixMonths = () => {
       const months = [];
       const endDateObj = new Date(endDate);
-
       for (let i = 5; i >= 0; i--) {
         const date = new Date(endDateObj);
         date.setMonth(date.getMonth() - i);
@@ -111,58 +76,46 @@ const Charts: React.FC<ChartsProps> = ({
     return {
       periodIncome,
       periodExpenses,
-      periodBalance,
+      periodBalance: periodIncome - periodExpenses,
       categoryData,
       lastSixMonths: getLastSixMonths()
     };
   }, [expenses, incomes, startDate, endDate, selectedCategories]);
 
-  // Configuration des graphiques
-  const doughnutData = useMemo(() => {
-    const getCategoryColor = (categoryName: string): string => {
-      const category = categories.find(c => c.name === categoryName);
-      return category?.color || '#CCCCCC'; // Always returns a string
-    };
+  const categoryColors = useMemo(() => [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', 
+    '#FF6384', '#C9CBCF', '#7CFC00', '#20B2AA', '#FF00FF', '#00FFFF',
+    '#FFD700', '#ADFF2F', '#FF4500', '#DA70D6', '#00BFFF', '#FF6347',
+    '#40E0D0', '#EE82EE', '#F5DEB3', '#00FA9A', '#FF69B4', '#BA55D3'
+  ], []);
 
+  const doughnutData = useMemo(() => {
+    const labels = Object.keys(categoryData);
     return {
-      labels: Object.keys(categoryData),
+      labels,
       datasets: [{
         data: Object.values(categoryData),
-        backgroundColor: Object.keys(categoryData).map(cat => getCategoryColor(cat)),
-        hoverBackgroundColor: Object.keys(categoryData).map(cat => getCategoryColor(cat)),
+        backgroundColor: labels.map((_, index) => categoryColors[index % categoryColors.length]),
+        hoverBackgroundColor: labels.map((_, index) => categoryColors[index % categoryColors.length]),
         borderWidth: 3,
         borderColor: '#ffffff',
         hoverBorderWidth: 4,
       }],
     };
-  }, [categoryData, categories]);
+  }, [categoryData, categoryColors]);
 
   const doughnutOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'bottom' as const,
-        labels: {
-          boxWidth: 15,
-          font: { size: 11 },
-          padding: 15,
-          usePointStyle: true,
-        }
-      },
-      title: {
-        display: true,
-        text: 'Répartition des Dépenses par Catégorie',
-        font: { size: 16 }
-      },
+      legend: { position: 'bottom' as const, labels: { boxWidth: 15, font: { size: 11 }, padding: 15, usePointStyle: true } },
+      title: { display: true, text: 'Répartition des Dépenses par Catégorie', font: { size: 16 } },
       tooltip: {
         callbacks: {
           label: function (context: any) {
-            const label = context.label || '';
-            const value = context.raw || 0;
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
-            return `${label}: Ar ${value} (${percentage}%)`;
+            const percentage = ((context.raw / total) * 100).toFixed(1);
+            return `${context.label}: Ar ${context.raw} (${percentage}%)`;
           }
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -175,9 +128,7 @@ const Charts: React.FC<ChartsProps> = ({
 
   const barData = useMemo(() => {
     const calculateMonthlyData = (month: string, data: FinancialItem[]) => {
-      return data
-        .filter(item => item.date.startsWith(month))
-        .reduce((sum, item) => sum + item.amount, 0);
+      return data.filter(item => item.date.startsWith(month)).reduce((sum, item) => sum + item.amount, 0);
     };
 
     return {
@@ -210,55 +161,32 @@ const Charts: React.FC<ChartsProps> = ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'top' as const,
-        labels: {
-          font: { size: 12 },
-          usePointStyle: true,
-          padding: 20
-        }
-      },
-      title: {
-        display: true,
-        text: 'Évolution Mensuelle des Revenus et Dépenses',
-        font: { size: 16 }
-      },
+      legend: { position: 'top' as const, labels: { font: { size: 12 }, usePointStyle: true, padding: 20 } },
+      title: { display: true, text: 'Évolution Mensuelle des Revenus et Dépenses', font: { size: 16 } },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         padding: 10,
         cornerRadius: 6,
         displayColors: true,
-        callbacks: {
-          label: function (context: any) {
-            return `${context.dataset.label}: Ar ${context.raw.toFixed(2)}`;
-          }
-        }
+        callbacks: { label: (context: any) => `${context.dataset.label}: Ar ${context.raw}` }
       }
     },
     scales: {
       y: {
         beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Montant (Ar)',
-          font: { size: 12 }
-        },
+        title: { display: true, text: 'Montant (Ar)', font: { size: 12 } },
         grid: { color: 'rgba(0, 0, 0, 0.1)' }
       },
       x: {
-        title: {
-          display: true,
-          text: 'Mois',
-          font: { size: 12 }
-        },
+        title: { display: true, text: 'Mois', font: { size: 12 } },
         grid: { display: false }
       },
     },
   }), []);
 
   const getCategoryColor = (categoryName: string) => {
-    const category = categories.find(c => c.name === categoryName);
-    return category ? category.color : '#CCCCCC';
+    const index = Object.keys(categoryData).indexOf(categoryName);
+    return index !== -1 ? categoryColors[index % categoryColors.length] : '#CCCCCC';
   };
 
   const hasExpenseData = Object.keys(categoryData).length > 0;
@@ -275,114 +203,67 @@ const Charts: React.FC<ChartsProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Graphique circulaire des catégories */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">
-            Répartition des Dépenses
-          </h3>
+          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Répartition des Dépenses</h3>
           <div className="h-80">
-            {hasExpenseData ? (
-              <Doughnut data={doughnutData} options={doughnutOptions} />
-            ) : (
-              <NoDataMessage message="Aucune donnée de dépenses pour cette période" />
-            )}
+            {hasExpenseData ? <Doughnut data={doughnutData} options={doughnutOptions} /> : 
+              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                <p className="text-gray-500 text-center">Aucune donnée de dépenses pour cette période</p>
+              </div>
+            }
           </div>
 
           {hasExpenseData && (
-            <CategoryDetails categoryData={categoryData} getCategoryColor={getCategoryColor} />
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Détails par catégorie</h4>
+              <ul className="space-y-2 max-h-40 overflow-y-auto">
+                {Object.entries(categoryData)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([category, amount]) => (
+                    <li key={category} className="flex justify-between items-center text-sm">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: getCategoryColor(category) }} />
+                        <span className="text-gray-600">{category}</span>
+                      </div>
+                      <span className="font-medium text-gray-900">Ar {amount}</span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
           )}
         </div>
 
-        {/* Graphique en barres historique */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">
-            Historique des Finances
-          </h3>
+          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Historique des Finances</h3>
           <div className="h-80">
-            {hasBarData ? (
-              <Bar data={barData} options={barOptions} />
-            ) : (
-              <NoDataMessage message="Aucune donnée disponible pour l'historique" />
-            )}
+            {hasBarData ? <Bar data={barData} options={barOptions} /> : 
+              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                <p className="text-gray-500 text-center">Aucune donnée disponible pour l'historique</p>
+              </div>
+            }
           </div>
 
-          <PeriodStats
-            periodIncome={periodIncome}
-            periodExpenses={periodExpenses}
-            periodBalance={periodBalance}
-          />
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Statistiques de la Période</h4>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="bg-green-100 p-3 rounded">
+                <div className="text-green-800 font-semibold">Revenus</div>
+                <div className="text-green-900 font-bold text-lg">Ar {periodIncome}</div>
+              </div>
+              <div className="bg-red-100 p-3 rounded">
+                <div className="text-red-800 font-semibold">Dépenses</div>
+                <div className="text-red-900 font-bold text-lg">Ar {periodExpenses}</div>
+              </div>
+              <div className={`${periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'} p-3 rounded col-span-2`}>
+                <div className={`${periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'} font-semibold`}>Solde Final</div>
+                <div className={`${periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} font-bold text-lg`}>Ar {periodBalance}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
-// Sous-composants
-const NoDataMessage: React.FC<{ message: string }> = ({ message }) => (
-  <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
-    <p className="text-gray-500 text-center">{message}</p>
-  </div>
-);
-
-const CategoryDetails: React.FC<{
-  categoryData: Record<string, number>;
-  getCategoryColor: (name: string) => string | undefined;
-}> = ({ categoryData, getCategoryColor }) => (
-  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-    <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Détails par catégorie</h4>
-    <ul className="space-y-2 max-h-40 overflow-y-auto">
-      {Object.entries(categoryData)
-        .sort(([, a], [, b]) => (b as number) - (a as number))
-        .map(([category, amount]) => (
-          <li key={category} className="flex justify-between items-center text-sm">
-            <div className="flex items-center">
-              <div
-                className="w-3 h-3 rounded-full mr-2"
-                style={{ backgroundColor: getCategoryColor(category) }}
-              />
-              <span className="text-gray-600">{category}</span>
-            </div>
-            <span className="font-medium text-gray-900">Ar {(amount as number)}</span>
-          </li>
-        ))}
-    </ul>
-  </div>
-);
-
-const PeriodStats: React.FC<{
-  periodIncome: number;
-  periodExpenses: number;
-  periodBalance: number;
-}> = ({ periodIncome, periodExpenses, periodBalance }) => (
-  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-    <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Statistiques de la Période</h4>
-    <div className="grid grid-cols-2 gap-3 text-sm">
-      <StatCard title="Revenus" value={periodIncome} bgColor="bg-green-100" textColor="text-green-800" valueColor="text-green-900" />
-      <StatCard title="Dépenses" value={periodExpenses} bgColor="bg-red-100" textColor="text-red-800" valueColor="text-red-900" />
-      <StatCard
-        title="Solde Final"
-        value={periodBalance}
-        bgColor={periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'}
-        textColor={periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'}
-        valueColor={periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'}
-        fullWidth
-      />
-    </div>
-  </div>
-);
-
-const StatCard: React.FC<{
-  title: string;
-  value: number;
-  bgColor: string;
-  textColor: string;
-  valueColor: string;
-  fullWidth?: boolean;
-}> = ({ title, value, bgColor, textColor, valueColor, fullWidth = false }) => (
-  <div className={`${bgColor} p-3 rounded ${fullWidth ? 'col-span-2' : ''}`}>
-    <div className={`${textColor} font-semibold`}>{title}</div>
-    <div className={`${valueColor} font-bold text-lg`}>Ar {value}</div>
-  </div>
-);
 
 export default Charts;

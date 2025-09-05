@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-
-interface Category {
-  id: number;
-  name: string;
-  user_id: number;
-  created_at?: string;
-  color?: string;
-}
-
-interface FiltersProps {
-  startDate: string;
-  endDate: string;
-  onStartDateChange: (date: string) => void;
-  onEndDateChange: (date: string) => void;
-  selectedCategories: string[];
-  onCategoriesChange: (categories: string[]) => void;
-  categories: Category[];
-}
+import type { FiltersProps } from '../../types/MonthlySummary.types';
 
 const Filters: React.FC<FiltersProps> = ({
   startDate,
