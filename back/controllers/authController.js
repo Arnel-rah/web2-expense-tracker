@@ -18,11 +18,11 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Créer l'utilisateur
-    const newUser = await createUser({ username, email, password: hashedPassword });
+    const newUser = await createUser({ email, password: hashedPassword });
 
     // Générer un token JWT (inscription --> connexion)
     const token = jwt.sign(
-      { userId: newUser.user_id, email: newUser.email }, // userId cohérent
+      { userId: newUser.user_id, email: newUser.email }, 
       config.jwtSecret,
       { expiresIn: "1h" }
     );
@@ -30,9 +30,8 @@ export const signup = async (req, res) => {
     res.status(201).json({
       message: "Utilisateur créé avec succès",
       user: {
-        userId: newUser.user_id, // uniforme avec le token
-        username: newUser.username,
-        email: newUser.email
+        userId: newUser.user_id,
+           email: newUser.email
       },
       token
     });
@@ -69,7 +68,6 @@ export const login = async (req, res) => {
       message: "Connexion réussie",
       user: {
         userId: user.user_id, 
-        username: user.username,
         email: user.email
       },
       token
