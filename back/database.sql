@@ -3,7 +3,6 @@
 -- ============================
 CREATE TABLE utilisateur (
     user_id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL CHECK (LENGTH(password) >= 6),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
