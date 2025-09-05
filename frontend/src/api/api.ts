@@ -1,26 +1,23 @@
-const BASE_URL = import.meta.env.VITE_API_URL; // récupérée de ton .env
+const BASE_URL = import.meta.env.VITE_API_URL;
 
-export async function apiFetch(endpoint, options = {}) {
-  const token = localStorage.getItem('authToken'); // récupère le token
+export async function apiFetch(endpoint: string, options = {}) {
+  const token = localStorage.getItem('authToken');
 
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers, // permet de personnaliser les headers
   };
 
   const config = {
     ...options,
-    headers, // headers bien regroupés ici
+    headers,
   };
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
   if (!response.ok) {
     if (response.status === 401) {
-      // Token expiré ou invalide
       localStorage.removeItem('authToken');
-      // Optionnel : rediriger vers la page de connexion
       // window.location.href = '/login';
     }
 

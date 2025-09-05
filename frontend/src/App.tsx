@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Auth from './pages/auth/Auth';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
-import Transaction from './pages/Transaction';
 import ExpenseForm from './components/form/ExpenseForm';
 import IncomeForm from './components/form/IncomeForm';
 
@@ -16,7 +15,6 @@ function App() {
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path='/transaction' element={<Transaction/>} />
           <Route path="/expenses" element={<ExpenseForm />} />
           <Route path="/incomes" element={<IncomeForm />} />
           <Route path="/categories" element={<></>} />
