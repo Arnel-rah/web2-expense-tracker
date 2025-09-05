@@ -39,8 +39,11 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
+    start.setHours(0, 0, 0, 0)
     end.setHours(23, 59, 59, 999);
 
+    console.log(start.getDate);
+    
     const filteredIncomes = incomes.filter(income => {
       const incomeDate = new Date(income.date);
       return incomeDate >= start && incomeDate <= end;
@@ -56,6 +59,14 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
       return matchesPeriod && matchesCategory;
     });
 
+    // console.log(
+    //   expenses.filter(
+    //     (expense) => {
+    //       return expense.date.includes(start.toDateString)
+    //     }
+    //   )
+    // );
+    
     const totalIncome = filteredIncomes.reduce((sum, income) => sum + income.amount, 0);
     const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
     const balance = totalIncome - totalExpenses;

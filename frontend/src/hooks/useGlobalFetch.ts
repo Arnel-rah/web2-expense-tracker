@@ -15,8 +15,8 @@ export default function useGlobalFetch(resourceName : string) {
         try {
             const result = await apiFetch(`/${resourceName}`);
             setData(result);
-        } catch (err) {
-            setError(err.message || 'Erreur')
+        } catch (error: any) {
+            setError(error.message || 'Erreur')
         } finally {
             setLoading(false)
         }
