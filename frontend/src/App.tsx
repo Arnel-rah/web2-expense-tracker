@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Auth from './pages/auth/Auth';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
-import ExpenseForm from './components/form/ExpenseForm';
-import IncomeForm from './components/form/IncomeForm';
+import Income from './pages/Income';
+import Expense from './pages/Expense';
 
 function App() {
 
@@ -15,8 +15,8 @@ function App() {
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/expenses" element={<ExpenseForm />} />
-          <Route path="/incomes" element={<IncomeForm />} />
+          <Route path="/expenses" element={<Expense />} />
+          <Route path="/incomes" element={<Income />} />
           <Route path="/categories" element={<></>} />
           <Route path="/profile" element={<></>} />
         </Routes>
