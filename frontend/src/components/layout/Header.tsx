@@ -14,8 +14,12 @@ const Header: React.FC = () => {
     navigate("/dashboard")
   };
   
-  const handleFinancial = () => {
+  const handleExpense = () => {
     navigate("/expenses")
+  };
+
+  const handleIncomes = () => {
+    navigate("/incomes")
   };
   
   const handleProfil = () => {
@@ -34,7 +38,8 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-15 text-gray-600">
           <div className='flex items-center gap-5 font-semibold text-xl'>
             <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleDashboard}>Dashboard</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleFinancial}>Financial</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleExpense}>Expense</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleIncomes}>Income</p>
             <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleProfil}>Profil</p>
           </div>
           <Button onClick={handleLogout}>Logout</Button>
