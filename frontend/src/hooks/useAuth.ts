@@ -1,4 +1,3 @@
-// hooks/useAuth.ts
 import { useState, useEffect } from 'react';
 import { getCurrentUser, logout as apiLogout } from '../services/backend';
 
@@ -22,7 +21,6 @@ export const useAuth = () => {
 
     checkAuth();
 
-    // Écouter les changements de localStorage
     const handleStorageChange = () => {
       checkAuth();
     };
