@@ -20,15 +20,14 @@ export default function Expense() {
 
   return (
     <>
-      {loading && <p>...</p>}
-      {err && <p>{err}</p>}
       <Header />
       <div className="flex">
         <div className="w-2/5">
           <ExpenseForm />
         </div>
         <div className="w-3/5">
-          <List data={data} transaction="expense" />
+          <List data={data} transaction="expense" loading={loading} err={err}/>
+          
         </div>
       </div>
     </>
