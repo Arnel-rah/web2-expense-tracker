@@ -26,3 +26,31 @@ export const getReceipt = async (req, res) => {
     res.status(500).json({ message: 'Error getting receipt' });
   }
 };
+
+export const uploadReceipt = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Aucun fichier reçu' });
+  }
+
+  const token = req.headers.authorization?.split(' ')[1];
+  const userId = jwt.verify(token, config.jwtSecret).userId;
+
+  const fileName = req.file.filename;
+  const fileType = req.file.mimetype;
+  const expenseId = req.body.expenseId; 
+
+  const result = await pool.query(
+    'INSERT INTO recu (user_id, file_path, file_type) VALUES ($1, $2, $3) RETURNING *',
+    [userId, fileName, fileType]
+  );
+
+  await pool.query(
+    'UPDATE depense SET receipt_id = $1 WHERE expense_id = $2 AND user_id = $3',
+    [result.rows[0].receipt_id, expenseId, userId]
+  );
+
+  res.status(201).json({
+    message: 'Reçu bien stocké ',
+    file: result.rows[0],
+  });
+};
