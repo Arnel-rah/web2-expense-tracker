@@ -6,8 +6,8 @@ import { getProfile } from '../controllers/profileController.js';
 const router = express.Router();
 
 router.use(logRequest);
-router.post('/signup', signup);
-router.post('/login', login);
-router.get('/me', authenticate, getProfile);
+router.post('/signup', signup);//veifié
+router.post('/login', login);//verifié
+router.get('/me', authenticate, getProfile);//verifié
 
 export default router;
