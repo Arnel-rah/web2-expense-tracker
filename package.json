@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev:server": "node ./back/server.js",
+    "dev:client": "cd frontend && npm run dev",
+    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
