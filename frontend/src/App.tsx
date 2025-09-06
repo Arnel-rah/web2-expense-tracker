@@ -3,10 +3,12 @@ import Auth from './pages/auth/Auth';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import List from './components/ui/TransactionsListe';
-import Transaction from './pages/Transaction';
+import Transaction from './pages/Expense';
 import ExpenseForm from './components/form/ExpenseForm';
 import IncomeForm from './components/form/IncomeForm';
 import EditTransaction from './pages/EditTransaction';
+import Expense from './pages/Expense';
+import Income from './pages/Income';
 
 function App() {
 
@@ -20,7 +22,9 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
 
 
-          <Route path='/transaction' element={<Transaction/>} />
+          <Route path='/expense' element={<Expense/>} />
+          <Route path='/income' element={<Income/>} />
+          
 
           <Route path='/income/new' element={<IncomeForm/>}/>
           <Route path='/income/:id/edit' element={<EditTransaction />}/>

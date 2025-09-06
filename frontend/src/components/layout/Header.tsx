@@ -1,5 +1,5 @@
 import React from 'react';
-import { logout } from '../../services/backend';
+// import { logout } from '../../services/backend';
 import Button from '../ui/Button';
 
 const Header: React.FC = () => {

@@ -1,14 +1,16 @@
-const BASE_URL = import.meta.env.VITE_API_URL; 
+const BASE_URL = import.meta.env.VITE_API_URL;
 
-export async function apiFetch(endpoint : string, options = {}) {
+export async function apiFetch(endpoint: string, options = {}) {
+  const token = localStorage.getItem('authToken');
   const headers: object = {
     'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Berer ${token}` }),
     ...options.headers,
   };
 
   const config = {
     ...options,
-    headers, 
+    headers,
   };
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
