@@ -6,7 +6,8 @@ export default function IncomeForm({ existingIncome = null }) {
     handleChange,
     handleSubmit,
     success,
-    error
+    error,
+    loading
   } = useForm(
     existingIncome || {
       amount: 0,
@@ -83,21 +84,22 @@ export default function IncomeForm({ existingIncome = null }) {
       <div className="pt-4">
         <button
           type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+          disabled={loading}
+          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
-          {formData.id ? "Mettre à jour" : "Ajouter"}
+          {loading ? 'Chargement...' : (formData.id ? "Mettre à jour" : "Ajouter")}
         </button>
       </div>
 
       {success && (
         <p className="mt-4 text-green-700 text-sm font-medium bg-green-100 p-2 rounded">
-          ✅ {success}
+          {success}
         </p>
       )}
 
       {error && (
         <p className="mt-4 text-red-700 text-sm font-medium bg-red-100 p-2 rounded">
-          ❌ {error}
+          {error}
         </p>
       )}
     </form>
