@@ -3,11 +3,11 @@ import pool from "../config/database.js";
 // Créer un utilisateur
 export const createUser = async ({ username, email, password }) => {
   const query = `
-    INSERT INTO utilisateur (username, email, password)
-    VALUES ($1, $2, $3)
+    INSERT INTO utilisateur (email, password)
+    VALUES ($1, $2)
     RETURNING *;
   `;
-  const values = [username, email, password];
+  const values = [email, password];
   const result = await pool.query(query, values);
   
   return result.rows[0];

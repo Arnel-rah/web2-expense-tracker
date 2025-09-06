@@ -6,7 +6,7 @@ import { authenticate } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.use(logRequest);
-router.get('/:idExpense', authenticate, getReceipt);
-router.post('/upload', authenticate, upload.single('receipt'), uploadReceipt);
+router.get('/:idExpense', authenticate, getReceipt);//Verifié
+router.post('/upload', authenticate, upload.single('receipt'), uploadReceipt);//Verifié
 
 export default router;

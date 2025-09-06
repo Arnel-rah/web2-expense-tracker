@@ -6,10 +6,10 @@ import { authenticate } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.use(logRequest);
-router.get('/', authenticate, getIncomes);
-router.get('/:id', authenticate, getIncomeById);
-router.post('/', authenticate, createIncome);
-router.put('/:id', authenticate, updateIncome);
-router.delete('/:id', authenticate, deleteIncome);
+router.get('/', authenticate, getIncomes);//verifié
+router.get('/:id', authenticate, getIncomeById);//verifié
+router.post('/', authenticate, createIncome);//verifié
+router.put('/:id', authenticate, updateIncome);//verifié
+router.delete('/:id', authenticate, deleteIncome);//verifié
 
 export default router;
