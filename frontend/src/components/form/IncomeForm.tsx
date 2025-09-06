@@ -1,7 +1,6 @@
-import useForm from "../../hooks/useForm";
+import useForm, { type FormDataBase } from "../../hooks/useForm";
 
-interface FormData {
-  id?: number;
+interface FormData extends FormDataBase{
   amount: number;
   date: string;
   source: string;
@@ -9,7 +8,7 @@ interface FormData {
   creationDate?: string;
 }
 
-export default function IncomeForm({ existingIncome = null }) {
+export default function IncomeForm ({ existingIncome = null }) {
   const {
     formData,
     handleChange,

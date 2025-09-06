@@ -1,11 +1,10 @@
 import { useState } from "react";
-import useForm from "../../hooks/useForm";
+import useForm, { type FormDataBase } from "../../hooks/useForm";
 import useGlobalFetch from "../../hooks/useGlobalFetch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faUpload } from "@fortawesome/free-solid-svg-icons";
 
-interface FormData {
-  id?: number;
+interface FormData extends FormDataBase{
   amount: number;
   date: string;
   categoryId: number;
