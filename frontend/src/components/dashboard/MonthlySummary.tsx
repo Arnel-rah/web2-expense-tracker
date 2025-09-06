@@ -5,7 +5,7 @@ import { FinancialCard } from './monthlySummary/FinancialCard';
 import { ExpenseRateBar } from './monthlySummary/ExpenseRateBar';
 import { LargestExpenseCard } from './monthlySummary/LargestExpenseCard';
 import { BudgetAlert } from './monthlySummary/BudgetAlert';
-import { NoDataState } from './monthlySummary/NodataState.tsx';
+import { NoDataState } from './monthlySummary/NoDataState.tsx';
 import { Header } from './monthlySummary/Header';
 import { useFinancialCalculations } from '../../hooks/useFinancialCalculations';
 

@@ -1,5 +1,14 @@
 import useForm from "../../hooks/useForm";
 
+interface FormData {
+  id?: number;
+  amount: number;
+  date: string;
+  source: string;
+  description: string;
+  creationDate?: string;
+}
+
 export default function IncomeForm({ existingIncome = null }) {
   const {
     formData,
@@ -8,7 +17,7 @@ export default function IncomeForm({ existingIncome = null }) {
     success,
     error,
     loading
-  } = useForm(
+  } = useForm<FormData>(
     existingIncome || {
       amount: 0,
       date: '',
