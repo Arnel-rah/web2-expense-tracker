@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; 
 import useForm, { type FormDataBase } from "../../hooks/useForm";
 import useGlobalFetch from "../../hooks/useGlobalFetch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faUpload } from "@fortawesome/free-solid-svg-icons";
 
-interface FormData extends FormDataBase{
+interface FormData extends FormDataBase {
   amount: number;
   date: string;
   categoryId: number;
@@ -21,17 +21,24 @@ interface Category {
   name: string;
 }
 
-export default function ExpenseForm({ existingExpense = null }) {
+interface ExpenseFormProps {
+  existingExpense?: FormData | null;
+  onSuccess?: () => void; 
+}
+
+export default function ExpenseForm({ existingExpense = null, onSuccess }: ExpenseFormProps) {
   const [isRecurring, setIsRecurring] = useState(false);
 
   const {
     formData,
+    setFormData,
     handleChange,
     handleSubmit,
     success,
-    error
+    error,
+    loading
   } = useForm<FormData>(
-    existingExpense || {
+    {
       amount: 0,
       date: '',
       categoryId: 0,
@@ -42,15 +49,30 @@ export default function ExpenseForm({ existingExpense = null }) {
       startDate: '',
       endDate: ''
     },
-    '/expenses'
+    '/expenses',
+    onSuccess
   );
 
-  const categories: { data: Category[] | null; loading: boolean; error: string | null } = useGlobalFetch("categories");
+  useEffect(() => {
+    if (existingExpense) {
+      setFormData(existingExpense);
+      setIsRecurring(existingExpense.type === "recurring");
+    }
+  }, [existingExpense, setFormData]);
+
+  const categories = useGlobalFetch("categories");
   const categoriesData: Category[] = categories.data || [];
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    await handleSubmit(e);
+    if (success && onSuccess) {
+      onSuccess();
+    }
+  };
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleFormSubmit}
       className="bg-white shadow-2xl w-full max-w-2xl mx-auto mt-8 p-6 rounded-2xl space-y-4"
     >
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
