@@ -2,9 +2,10 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 
 export async function apiFetch(endpoint: string, options = {}) {
   const token = localStorage.getItem('authToken');
-  const headers: object = {
+
+  const headers = {
     'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Berer ${token}` }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
 
@@ -16,6 +17,11 @@ export async function apiFetch(endpoint: string, options = {}) {
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+    }
+
     const errorBody = await response.json().catch(() => ({}));
     const message = errorBody.message || 'Erreur réseau';
     throw new Error(message);

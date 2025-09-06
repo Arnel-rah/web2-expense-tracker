@@ -1,13 +1,33 @@
-import express from "express"
+import express from "express";
+import cors from "cors";
+import expensesRouter from "./routes/expenses.route.js";
+import authRouter from "./routes/auth.route.js";
+import incomesRouter from "./routes/incomes.route.js";
+import categoriesRouter from "./routes/categories.routes.js";
+import summaryRouter from "./routes/summary.route.js";
+import receiptsRouter from "./routes/receipts.route.js";
+import profileRouter from "./routes/profile.route.js";
+import { logRequest } from "./middlewares/example.js";
+
 const app = express();
+const port = 8080;
 
-const port = 3000;
+app.use(express.json());
+app.use(cors());
+app.use(logRequest);
+app.use('/api/auth', authRouter);
+app.use('/api/expenses', expensesRouter);
+app.use('/api/incomes', incomesRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/summary', summaryRouter);
+app.use('/api/receipts', receiptsRouter);
+app.use('/api/user', profileRouter);
 
-
-app.get('/', async (_req, res) => {
-    res.json({message: "server run"})
-})
 app.listen(port, () => {
-    console.log(`Server run at http://localhost:${port}`);
-})
+  console.log(`Server running at http://localhost:${port}`);
+});
 
+app.use((err, _req, res, _next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});

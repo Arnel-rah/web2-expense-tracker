@@ -31,7 +31,7 @@ export default function Home() {
 
             <div className="w-full xl:h-screen xl:w-1/2">
                 <img
-                    src="/public/expenseImage.jpg"
+                    src="/src/assets/img/expenseImage.jpg"
                     alt="Expense tracking illustration"
                     className="w-full h-full object-cover"
                 />

@@ -1,14 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, data } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './pages/auth/Auth';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
-import List from './components/ui/TransactionsListe';
-import Transaction from './pages/Expense';
-import ExpenseForm from './components/form/ExpenseForm';
-import IncomeForm from './components/form/IncomeForm';
-import EditTransaction from './pages/EditTransaction';
-import Expense from './pages/Expense';
-import Income from './pages/Income';
+import Income from './pages/Incomes';
+import Expense from './pages/Expenses';
 
 function App() {
 
@@ -20,15 +15,10 @@ function App() {
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
           <Route path="/dashboard" element={<Dashboard />} />
-
-
-          <Route path='/expense' element={<Expense/>} />
-          <Route path='/income' element={<Income/>} />
-          
-
-          <Route path='/income/new' element={<IncomeForm/>}/>
-          <Route path='/income/:id/edit' element={<EditTransaction />}/>
-          <Route path='/expense/new' element={<ExpenseForm/>}/>
+          <Route path="/expenses" element={<Expense />} />
+          <Route path="/incomes" element={<Income />} />
+          <Route path="/categories" element={<></>} />
+          <Route path="/profile" element={<></>} />
         </Routes>
       </div>
     </Router>
