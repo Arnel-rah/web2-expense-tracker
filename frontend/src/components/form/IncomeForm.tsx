@@ -15,7 +15,7 @@ export default function IncomeForm({ existingIncome = null }) {
       source: '',
       description: ''
     },
-    '/income'
+    '/incomes'
   );
 
   return (
