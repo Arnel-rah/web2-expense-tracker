@@ -21,7 +21,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   const API_BASE_URL = 'http://localhost:8080/api';
   
   const [email, setEmail] = useState(mode === 'login' ? 'user@gmail.com' : '');
-  const [password, setPassword] = useState(mode === 'login' ? '1234' : '');
+  const [password, setPassword] = useState(mode === 'login' ? '12345678' : '');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +82,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   useEffect(() => {
     if (mode === 'login') {
       setEmail('user@gmail.com');
-      setPassword('1234');
+      setPassword('12345678');
     } else {
       setEmail('');
       setPassword('');
@@ -103,8 +103,8 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
           setIsLoading(false);
           return;
         }
-        if (password.length < 4) {
-          setError("Password must be at least 4 characters long");
+        if (password.length < 6) {
+          setError("Password must be at least 6 characters long");
           setIsLoading(false);
           return;
         }

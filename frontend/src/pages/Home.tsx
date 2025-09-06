@@ -29,7 +29,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="w-full lg:h-screen lg:w-1/2">
+            <div className="w-full xl:h-screen xl:w-1/2">
                 <img
                     src="/src/assets/img/expenseImage.jpg"
                     alt="Expense tracking illustration"
