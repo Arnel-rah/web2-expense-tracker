@@ -1,30 +1,14 @@
 import React from 'react';
-// import { logout } from '../../services/backend';
 import Button from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+
   const handleLogout = () => {
-    logout();
-    window.location.href = '/login';
-  };
-
-  const handleDashboard = () => {
-    navigate("/dashboard")
-  };
-  
-  const handleExpense = () => {
-    navigate("/expenses")
-  };
-
-  const handleIncomes = () => {
-    navigate("/incomes")
-  };
-  
-  const handleProfil = () => {
-    navigate("/profile")
-  };
+    localStorage.removeItem('token');
+    navigate("/login");
+  }
 
   return (
     <header className="bg-white shadow">
@@ -37,10 +21,10 @@ const Header: React.FC = () => {
 
         <div className="flex items-center gap-15 text-gray-600">
           <div className='flex items-center gap-5 font-semibold text-xl'>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleDashboard}>Dashboard</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleExpense}>Expense</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleIncomes}>Income</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={handleProfil}>Profil</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/dashboard")}>Dashboard</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/expenses")}>Expense</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/incomes")}>Income</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/profil")}>Profil</p>
           </div>
           <Button onClick={handleLogout}>Logout</Button>
         </div>

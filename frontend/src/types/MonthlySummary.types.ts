@@ -53,4 +53,5 @@ export interface MonthlySummaryProps {
   startDate: string;
   endDate: string;
   selectedCategories: string[];
+  onReload?: () => Promise<void>;
 }
