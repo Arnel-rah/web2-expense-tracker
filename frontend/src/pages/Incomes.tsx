@@ -3,32 +3,27 @@ import Header from "../components/layout/Header";
 import List from "../components/ui/TransactionsListe";
 import useGlobalFetch from "../hooks/useGlobalFetch";
 
+
+
 export default function Income() {
+    const { data, loading, error } = useGlobalFetch("incomes");
 
-  const incomeData = useGlobalFetch("expense");
-
-  const loading = incomeData.loading;
-  const err = incomeData.error;
-
-
-  const data = [
-    ...(incomeData.data || [])
-  ]
-
-
-
-
-  return (
-    <>
-      <Header />
-      <div className="flex">
-        <div className="w-2/5">
-          <IncomeForm />
-        </div>
-        <div className="w-3/5">
-          <List data={data} transaction={"income"} loading={loading} err={err}/>
-        </div>
-      </div>
-    </>
-  )
+    return (
+        <> 
+            <Header />
+            <div className="flex">
+                <div className="w-2/5">
+                    <IncomeForm />
+                </div>
+                <div className="w-3/5">
+                    <List 
+                        data={data ? [...data] : []}
+                        transaction="income"
+                        loading={loading}
+                        err={error}
+                    />
+                </div>
+            </div>
+        </> 
+    );
 }

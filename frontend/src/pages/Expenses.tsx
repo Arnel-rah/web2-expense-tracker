@@ -4,19 +4,7 @@ import List from "../components/ui/TransactionsListe";
 import useGlobalFetch from "../hooks/useGlobalFetch";
 
 export default function Expense() {
-
-  const expneseData = useGlobalFetch("expenses");
-
-  const loading = expneseData.loading;
-  const err = expneseData.error;
-
-
-  const data = [
-    ...(expneseData.data || [])
-  ]
-
-
-
+  const { data, loading, error } = useGlobalFetch("expenses");
 
   return (
     <>
@@ -26,10 +14,14 @@ export default function Expense() {
           <ExpenseForm />
         </div>
         <div className="w-3/5">
-          <List data={data} transaction="expenses" loading={loading} err={err}/>
-          
+          <List
+            data={data ? [...data] : []}
+            transaction="expense"
+            loading={loading}
+            err={error}
+          />
         </div>
       </div>
     </>
-  )
+  );
 }
