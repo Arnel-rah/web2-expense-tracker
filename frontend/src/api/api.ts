@@ -6,6 +6,7 @@ export async function apiFetch(endpoint: string, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
   };
 
   const config = {
@@ -18,7 +19,7 @@ export async function apiFetch(endpoint: string, options = {}) {
   if (!response.ok) {
     if (response.status === 401) {
       localStorage.removeItem('authToken');
-      // window.location.href = '/login';
+      window.location.href = '/login';
     }
 
     const errorBody = await response.json().catch(() => ({}));

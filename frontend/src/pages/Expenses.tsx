@@ -5,7 +5,7 @@ import useGlobalFetch from "../hooks/useGlobalFetch";
 
 export default function Expense() {
 
-  const expneseData = useGlobalFetch("expense");
+  const expneseData = useGlobalFetch("expenses");
 
   const loading = expneseData.loading;
   const err = expneseData.error;
@@ -26,7 +26,7 @@ export default function Expense() {
           <ExpenseForm />
         </div>
         <div className="w-3/5">
-          <List data={data} transaction="expense" loading={loading} err={err}/>
+          <List data={data} transaction="expenses" loading={loading} err={err}/>
           
         </div>
       </div>

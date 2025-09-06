@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { apiFetch } from "../api/api";
 
-export default function useForm(initialValues: object, endpointBase: string) {
+export default function useForm<T extends object>(initialValues: T, endpointBase: string) {
   const [formData, setFormData] = useState(initialValues);
-  const [success, setSuccess] = useState(null);
-  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleChange = (e: { target: { name: string; value: unknown; }; }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -14,28 +15,42 @@ export default function useForm(initialValues: object, endpointBase: string) {
     }));
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(null);
     setError(null);
+    setLoading(true);
 
     const isUpdate = !!formData.id; 
-
-    const endpoint = isUpdate
-      ? `${endpointBase}/${formData.id}`
-      : endpointBase;
-
+    const endpoint = isUpdate ? `${endpointBase}/${formData.id}` : endpointBase;
     const method = isUpdate ? "PUT" : "POST";
 
     try {
       await apiFetch(endpoint, {
         method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData),
       });
-      setSuccess(isUpdate ? "!" : "Ajout réussi !");
+      
+      setSuccess(isUpdate ? "Mise à jour réussie !" : "Ajout réussi !");
+      
+      if (!isUpdate) {
+        setFormData(initialValues);
+      }
+      
     } catch (err) {
-      setError(err.message || "Erreur");
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    setFormData(initialValues);
+    setSuccess(null);
+    setError(null);
   };
 
   return {
@@ -45,5 +60,7 @@ export default function useForm(initialValues: object, endpointBase: string) {
     handleSubmit,
     success,
     error,
+    loading,
+    resetForm
   };
 }
