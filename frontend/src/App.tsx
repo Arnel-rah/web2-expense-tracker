@@ -6,6 +6,12 @@ import Income from './pages/Incomes';
 import Expense from './pages/Expenses';
 
 function App() {
+  const PrivateRoute = (Component: React.FC) => {
+    return () => {
+      const token = localStorage.getItem("token");
+      return token ? <Component /> : <Navigate to="/login" replace />;
+    };
+  };
 
   return (
     <Router>
@@ -14,11 +20,12 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/expenses" element={<Expense />} />
-          <Route path="/incomes" element={<Income />} />
-          <Route path="/categories" element={<></>} />
-          <Route path="/profile" element={<></>} />
+
+          <Route path="/dashboard" element={PrivateRoute(Dashboard)()} />
+          <Route path="/expenses" element={PrivateRoute(Expense)()} />
+          <Route path="/incomes" element={PrivateRoute(Income)()} />
+          <Route path="/categories" element={PrivateRoute(() => <></>)()} />
+          <Route path="/profile" element={PrivateRoute(() => <></>)()} />
         </Routes>
       </div>
     </Router>
