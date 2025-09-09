@@ -12,13 +12,13 @@ import {
 } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons';
-import type { Category, FinancialItem } from '../../types/MonthlySummary.types';
+import type { Category, Expense, Income } from '../../../types';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 interface ChartsProps {
-  expenses: FinancialItem[];
-  incomes: FinancialItem[];
+  expenses: Expense[];
+  incomes: Income[];
   startDate: string;
   endDate: string;
   selectedCategories: string[];
@@ -127,7 +127,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
   }), []);
 
   const barData = useMemo(() => {
-    const calculateMonthlyData = (month: string, data: FinancialItem[]) => {
+    const calculateMonthlyData = (month: string, data: Expense[] | Income[]) => {
       return data.filter(item => item.date.startsWith(month)).reduce((sum, item) => sum + item.amount, 0);
     };
 
