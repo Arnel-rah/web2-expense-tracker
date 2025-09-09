@@ -1,25 +1,25 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 
-interface LoaderProps {
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-}
+export const Loader = () => {
+  const [dots, setDots] = useState('');
 
-export const Loader: React.FC<LoaderProps> = ({ 
-  size = 'md', 
-  className = '' 
-}) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => prev.length >= 3 ? '' : prev + '.');
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className={`flex justify-center items-center ${className}`}>
-      <div
-        className={`${sizeClasses[size]} border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin`}
-      />
+    <div className="w-full h-screen flex flex-col items-center justify-center">
+      <div className="relative">
+        <div className="animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 h-8 w-8" />
+        <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-r-blue-400 h-8 w-8" 
+             style={{ animationDelay: '150ms', animationDuration: '1.5s' }} />
+      </div>
+      <p className="mt-4 text-gray-600 text-sm animate-pulse">
+        Chargement{dots}
+      </p>
     </div>
   );
 };
