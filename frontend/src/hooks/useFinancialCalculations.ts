@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import type { FinancialItem } from '../types/MonthlySummary.types.ts';
 import { createDateRange, isInDateRange } from '../utils/utils.ts';
+import type { Expense, Income } from '../types';
 
 export const useFinancialCalculations = (
-  expenses: FinancialItem[],
-  incomes: FinancialItem[],
+  expenses: Expense[],
+  incomes: Income[],
   startDate: string,
   endDate: string,
   selectedCategories: string[]

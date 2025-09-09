@@ -1,3 +1,5 @@
+import type { Expense } from "./expenses.types"
+import type { Income } from "./incomes.types"; 
 import type { Category } from "./categories.types";
 
 export interface FiltersProps {
@@ -18,10 +20,14 @@ export interface FinancialItem {
 }
 
 export interface MonthlySummaryProps {
-  expenses: FinancialItem[];
-  incomes: FinancialItem[];
+  summary?: {
+    total_income: number | string;
+    total_expenses: number | string;
+    balance: number;
+  };
+  expenses: Expense[];
+  incomes: Income[];
   startDate: string;
   endDate: string;
   selectedCategories: string[];
-  onReload?: () => Promise<void>;
 }
