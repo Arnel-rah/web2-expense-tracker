@@ -1,8 +1,8 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 export async function apiFetch(endpoint: string, options = {}) {
-  const token = localStorage.getItem('authToken');
-
+  const token = localStorage.getItem('token');
+  
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -18,7 +18,7 @@ export async function apiFetch(endpoint: string, options = {}) {
 
   if (!response.ok) {
     if (response.status === 401) {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
 
