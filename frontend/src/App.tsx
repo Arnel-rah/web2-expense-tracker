@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Income from './pages/Incomes';
 import Expense from './pages/Expenses';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { Toast } from './components/ui/Toast';
 
 function App() {
 
@@ -55,7 +56,10 @@ function App() {
               </ProtectedRoute>
             }
           />
-        </Routes>
+        </Routes> 
+
+        <Toast />
+        
       </div>
     </Router>
   );
