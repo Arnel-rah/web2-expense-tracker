@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { useAuth } from '../hooks/useAuth';
-import type { AuthProps } from '../types/auth.types';
+import type { AuthFormData, AuthProps } from '../types';
 
 const Auth: React.FC<AuthProps> = ({ mode }) => {
   const formValue = {
@@ -11,8 +11,9 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
     password: mode === 'login' ? '12345678' : '',
     confirmPassword: ''
   }
-  const [formData, setFormData] = useState(formValue);
+  const [formData, setFormData] = useState<AuthFormData>(formValue);
   const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login, signup, loading: authLoading, error: authError } = useAuth();
   const navigate = useNavigate();
@@ -45,14 +46,30 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    setIsSubmitting(true);
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
 
-    const result = mode === 'login'
-      ? await login(formData.email, formData.password)
-      : await signup(formData.email, formData.password);
+    try {
+      console.log('Tentative de connexion avec:', formData.email);
+      const result = mode === 'login'
+        ? await login(formData.email, formData.password)
+        : await signup(formData.email, formData.password);
 
-    if (result.success) navigate('/dashboard');
+      console.log('Réponse reçue:', result);
+
+      if (result.token) {
+        console.log('Token reçu, navigation vers dashboard');
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Erreur complète:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: keyof typeof formData) =>
@@ -62,6 +79,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
 
   const isSignupMode = mode === 'signup';
   const error = formError || authError;
+  const isLoading = isSubmitting || authLoading; // Combine les deux loadings
 
   return (
     <div className="min-h-screen flex flex-row-reverse items-center justify-around py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -89,6 +107,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
               name="Email Address"
               value={formData.email}
               onChange={handleInputChange('email')}
+              disabled={isLoading} // Désactive les champs pendant le loading
             />
 
             <Input
@@ -97,6 +116,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
               name="Password"
               value={formData.password}
               onChange={handleInputChange('password')}
+              disabled={isLoading}
             />
 
             {isSignupMode && (
@@ -106,14 +126,15 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
                 name="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleInputChange('confirmPassword')}
+                disabled={isLoading}
               />
             )}
           </div>
 
           <Button
             type="submit"
-            isLoading={authLoading}
-            disabled={authLoading}
+            isLoading={isLoading} // Utilise le loading combiné
+            disabled={isLoading}
             className="w-full"
           >
             {isSignupMode ? 'Sign up' : 'Login'}
@@ -124,6 +145,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
             <Link
               to={isSignupMode ? '/login' : '/signup'}
               className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+              onClick={(e) => isLoading && e.preventDefault()} // Empêche la navigation pendant le loading
             >
               {isSignupMode ? 'Login' : 'Sign up'}
             </Link>
