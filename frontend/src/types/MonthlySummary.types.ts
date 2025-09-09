@@ -1,34 +1,4 @@
-export interface Expense {
-  id: number;
-  amount: number;
-  date: string;
-  category_id: string;
-  description?: string | null;
-  type: 'one-time' | 'recurring';
-  start_date?: string | null;
-  end_date?: string | null;
-  receipt?: string | null;
-  user_id: number;
-  created_at?: string;
-}
-
-export interface Income {
-  id: number;
-  amount: number;
-  date: string;
-  source: string;
-  description?: string | null;
-  user_id: number;
-  created_at?: string;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  user_id: number;
-  created_at?: string;
-  color?: string;
-}
+import type { Category } from "./categories.types";
 
 export interface FiltersProps {
   startDate: string;

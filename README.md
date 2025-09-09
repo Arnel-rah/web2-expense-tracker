@@ -22,7 +22,7 @@ npm run install-all
 
 ```.bash
 cd ../frontend
-npm run install-all
+npm install
 ```
 
 ## Create database

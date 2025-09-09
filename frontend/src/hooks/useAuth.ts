@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AuthService } from '../services/auth.service';
+import { authService } from '../services/auth.service';
 import { storageService } from '../services/storage.service';
 
 export const useAuth = () => {
@@ -23,7 +23,7 @@ export const useAuth = () => {
         return;
       }
 
-      const userData = await AuthService.getProfile();
+      const userData = await authService.getProfile();
       setUser(userData);
     } catch {
       storageService.clearAuth();
@@ -38,7 +38,7 @@ export const useAuth = () => {
       setLoading(true);
       setError(null);
       
-      const response = await AuthService[action](email, password);
+      const response = await authService[action](email, password);
       setUser(response.user);
       return { success: true, data: response };
     } catch (err) {

@@ -2,14 +2,27 @@ export interface AuthProps {
   mode: 'login' | 'signup';
 }
 
-export interface AuthResponse {
-  token?: string;
-  message?: string;
-  user?: User;
+export interface AuthProps {
+  email: string
+  password: string
+  confirmPassword: string
 }
 
+export interface AuthResponse {
+  message?: string;
+  user?: User;
+  token?: string;
+}
+
+export interface AuthError extends Error {
+  status?: number;
+  details?: any;
+}
+
+
 export interface User {
-  id: number;
+  user_id: number;
   email: string;
-  createdAt: string;
+  password: string;
+  created_at: string;
 }

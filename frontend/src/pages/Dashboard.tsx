@@ -3,9 +3,11 @@ import Header from "../components/layout/Header";
 import MonthlySummary from '../components/dashboard/MonthlySummary';
 import Charts from '../components/dashboard/Charts';
 import Filters from '../components/dashboard/Filters';
-import type { Expense, Income, Category, FiltersProps } from '../types/MonthlySummary.types';
-
-const API_URL = 'http://localhost:8080/api';
+import type { FiltersProps } from '../types/MonthlySummary.types';
+import type { Expense } from '../types/expenses.types';
+import type { Income } from '../types/incomes.types';
+import type { Category } from '../types/categories.types';
+import { API_BASE_URL } from '../constants/api';
 
 const getDefaultDateRange = () => ({
   start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -22,7 +24,7 @@ const useApiData = () => {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchData = async (endpoint: string) => {
-    const response = await fetch(`${API_URL}/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
       method: 'GET',
       headers: createAuthHeaders()
     });
@@ -158,11 +160,11 @@ export default function Dashboard() {
           />
           
           <div className="lg:col-span-3">
-            <MonthlySummary {...dataProps} />
+            {/* <MonthlySummary {...dataProps} /> */}
           </div>
         </div>
 
-        <Charts {...dataProps} />
+        {/* <Charts {...dataProps} /> */}
       </main>
     </div>
   );

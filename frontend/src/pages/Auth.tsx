@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { useAuth } from '../hooks/useAuth';
-import type { AuthProps } from '../types/Auth.types';
+import type { AuthProps } from '../types/auth.types';
 
 const Auth: React.FC<AuthProps> = ({ mode }) => {
   const formValue = {
