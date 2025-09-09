@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Income from './pages/Incomes';
 import Expense from './pages/Expenses';
+import Profile from './pages/Profile';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Toast } from './components/ui/Toast';
 
@@ -52,7 +53,7 @@ function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <></>
+                <Profile />
               </ProtectedRoute>
             }
           />

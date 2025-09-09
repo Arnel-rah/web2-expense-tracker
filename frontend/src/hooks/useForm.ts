@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { apiFetch } from "../api/api";
 
-export default function useForm<T extends object>(initialValues: T, endpointBase: string) {
+export interface FormDataBase {
+  id?: number;
+}
+
+export default function useForm<T extends FormDataBase>(
+  initialValues: T, 
+  endpointBase: string,
+  onSuccess?: () => void 
+) {
   const [formData, setFormData] = useState(initialValues);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +46,11 @@ export default function useForm<T extends object>(initialValues: T, endpointBase
       
       if (!isUpdate) {
         setFormData(initialValues);
+      }
+      
+      
+      if (onSuccess) {
+        onSuccess(); 
       }
       
     } catch (err) {

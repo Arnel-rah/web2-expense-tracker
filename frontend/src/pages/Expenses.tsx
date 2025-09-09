@@ -1,35 +1,55 @@
+import { useState } from "react";
 import ExpenseForm from "../components/form/ExpenseForm";
 import Header from "../components/layout/Header";
 import List from "../components/ui/TransactionsListe";
 import useGlobalFetch from "../hooks/useGlobalFetch";
+import { apiFetch } from "../api/api";
 
 export default function Expense() {
+  const { data, loading, error, refetch } = useGlobalFetch("expenses");
+  const [editingExpense, setEditingExpense] = useState(null); 
 
-  const expneseData = useGlobalFetch("expenses");
+  const handleEdit = (expense: any) => {
+    setEditingExpense(expense); 
+  };
 
-  const loading = expneseData.loading;
-  const err = expneseData.error;
+  const handleDelete = async (id: number | string) => {
+    if (confirm("Are you sure you want to delete this expense?")) {
+      try {
+        await apiFetch(`/expenses/${id}`, { method: "DELETE" });
+        refetch(); 
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+    }
+  };
 
-
-  const data = [
-    ...(expneseData.data || [])
-  ]
-
-
-
+  const handleFormSuccess = () => {
+    setEditingExpense(null); 
+    refetch(); 
+  };
 
   return (
     <>
       <Header />
       <div className="flex">
         <div className="w-2/5">
-          <ExpenseForm />
+          <ExpenseForm 
+            existingExpense={editingExpense} 
+            onSuccess={handleFormSuccess}
+          />
         </div>
         <div className="w-3/5">
-          <List data={data} transaction="expenses" loading={loading} err={err}/>
-          
+          <List
+            data={data || []}
+            transaction="expense"
+            loading={loading}
+            err={error}
+            onEdit={handleEdit} 
+            onDelete={handleDelete} 
+          />
         </div>
       </div>
     </>
-  )
+  );
 }
