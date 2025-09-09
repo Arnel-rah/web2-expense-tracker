@@ -5,7 +5,7 @@ import useGlobalFetch from "../hooks/useGlobalFetch";
 
 export default function Income() {
 
-  const incomeData = useGlobalFetch("expense");
+  const incomeData = useGlobalFetch("incomes");
 
   const loading = incomeData.loading;
   const err = incomeData.error;
