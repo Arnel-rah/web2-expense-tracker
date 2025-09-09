@@ -128,7 +128,10 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
 
   const barData = useMemo(() => {
     const calculateMonthlyData = (month: string, data: Expense[] | Income[]) => {
-      return data.filter(item => item.date.startsWith(month)).reduce((sum, item) => sum + item.amount, 0);
+      return data.filter(item => {
+        // Vérification que item.date n'est pas null avant d'utiliser startsWith
+        return item.date && item.date.startsWith(month);
+      }).reduce((sum, item) => sum + item.amount, 0);
     };
 
     return {
@@ -191,8 +194,8 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
 
   const hasExpenseData = Object.keys(categoryData).length > 0;
   const hasBarData = lastSixMonths.some(month =>
-    expenses.some(expense => expense.date.startsWith(month)) ||
-    incomes.some(income => income.date.startsWith(month))
+    expenses.some(expense => expense.date && expense.date.startsWith(month)) ||
+    incomes.some(income => income.date && income.date.startsWith(month))
   );
 
   return (

@@ -31,3 +31,16 @@ export interface MonthlySummaryProps {
   endDate: string;
   selectedCategories: string[];
 }
+
+export interface FinancialCalculations {
+  filteredIncomes: Income[];
+  filteredExpenses: Expense[];
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
+  savingsRate: number;
+  expenseRate: number;
+  largestExpense: Expense | null;
+  isOverBudget: boolean;
+  overBudgetAmount: number;
+}

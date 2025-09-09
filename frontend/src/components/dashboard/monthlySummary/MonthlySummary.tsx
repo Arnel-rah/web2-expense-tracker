@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { MonthlySummaryProps } from '../../../types/MonthlySummary.types.ts';
 
 import { FinancialCard } from './FinancialCard.tsx';
@@ -15,13 +15,13 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   console.log("summary:", monthlySummary.summary);
-  //   console.log("expenses:", monthlySummary.expenses);
-  //   console.log("incomes:", monthlySummary.incomes);
-  //   console.log("date:", monthlySummary.startDate + "--->" + monthlySummary.endDate);
-  //   console.log("selectedCategories:", monthlySummary.selectedCategories);
-  // }, [monthlySummary]);
+  useEffect(() => {
+    console.log("summary:", monthlySummary.summary);
+    console.log("expenses:", monthlySummary.expenses);
+    console.log("incomes:", monthlySummary.incomes);
+    console.log("date:", monthlySummary.startDate + "--->" + monthlySummary.endDate);
+    console.log("selectedCategories:", monthlySummary.selectedCategories);
+  }, [monthlySummary]);
 
   const handleReload = async () => {
     // if (!onReload) return;
