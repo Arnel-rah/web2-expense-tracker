@@ -2,7 +2,10 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 
 export async function apiFetch(endpoint: string, options = {}) {
   const token = localStorage.getItem('token');
-  
+ if (!token) {
+    window.location.href = '/login';
+    return; 
+  }
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
