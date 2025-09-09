@@ -1,22 +1,5 @@
 import { API_BASE_URL } from "../constants/api"
-
-export interface Receipt {
-  receipt_id: number;
-  user_id: number;
-  file_path: string;
-  file_type: string;
-  uploaded_at: string;
-}
-
-export interface UploadReceiptResponse {
-  message: string;
-  file: Receipt;
-}
-
-export interface ApiError {
-  message: string;
-  status?: number;
-}
+import type { UploadReceiptResponse } from "../types/receipts.types";
 
 export const receiptService = {
   /**
@@ -80,31 +63,6 @@ export const receiptService = {
   },
 
   /**
-   * Récupère les informations metadata d'un reçu (sans le fichier)
-   */
-  getReceiptInfo: async (expenseId: number | string): Promise<Receipt> => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      throw new Error('Token d\'authentification manquant');
-    }
-
-    const response = await fetch(`${API_BASE_URL}/receipts/${expenseId}/info`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Erreur de récupération' }));
-      throw new Error(errorData.message || `Erreur ${response.status}: ${response.statusText}`);
-    }
-
-    return await response.json();
-  },
-
-  /**
    * Utilitaires pour gérer le téléchargement du fichier dans le navigateur
    */
   downloadUtils: {
@@ -141,13 +99,13 @@ export const receiptService = {
 // Exemple d'utilisation :
 /**/
 // Télécharger un reçu
-try {
-  const blob = await receiptService.downloadReceipt(4, 'application/pdf');
-  const filename = receiptService.downloadUtils.generateFilename('test123', 'application/pdf');
-  receiptService.downloadUtils.downloadBlob(blob, filename);
-} catch (error) {
-  console.error('Erreur de téléchargement:', error);
-}
+// try {
+//   const blob = await receiptService.downloadReceipt(4, 'application/pdf');
+//   const filename = receiptService.downloadUtils.generateFilename('test123', 'application/pdf');
+//   receiptService.downloadUtils.downloadBlob(blob, filename);
+// } catch (error) {
+//   console.error('Erreur de téléchargement:', error);
+// }
 /*
 // Uploader un reçu
 try {

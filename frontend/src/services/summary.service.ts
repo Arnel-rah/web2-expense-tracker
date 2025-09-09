@@ -24,7 +24,6 @@ export const summaryService = {
       const response = await fetch(`${API_BASE_URL}/summary/monthly`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
@@ -42,10 +41,9 @@ export const summaryService = {
   summary: async (): Promise<SummaryResponse> => {
     try {
       const token = storageService.getToken();
-      const response = await fetch(`${API_BASE_URL}/summary/`, {
+      const response = await fetch(`${API_BASE_URL}/summary`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
@@ -60,21 +58,20 @@ export const summaryService = {
   /**
    * Récupère les alertes
    */
-  alerts: async (): Promise<SummaryResponse> => {
-    try {
-      const token = storageService.getToken();
-      const response = await fetch(`${API_BASE_URL}/summary/alerts`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
+  // alerts: async (): Promise<SummaryResponse> => {
+  //   try {
+  //     const token = storageService.getToken();
+  //     const response = await fetch(`${API_BASE_URL}/summary/alerts`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`
+  //       }
+  //     });
 
-      return await handleResponse(response);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des alertes:', error);
-      throw new Error('Impossible de récupérer les alertes.');
-    }
-  }
+  //     return await handleResponse(response);
+  //   } catch (error) {
+  //     console.error('Erreur lors de la récupération des alertes:', error);
+  //     throw new Error('Impossible de récupérer les alertes.');
+  //   }
+  // }
 };
