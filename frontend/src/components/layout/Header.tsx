@@ -1,12 +1,13 @@
 import React from 'react';
 import Button from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { storageService } from '../../services/storage.service';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    storageService.clearAuth();
     navigate("/login");
   }
 
@@ -24,7 +25,7 @@ const Header: React.FC = () => {
             <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/dashboard")}>Dashboard</p>
             <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/expenses")}>Expense</p>
             <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/incomes")}>Income</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/profil")}>Profil</p>
+            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/profile")}>Profile</p>
           </div>
           <Button onClick={handleLogout}>Logout</Button>
         </div>

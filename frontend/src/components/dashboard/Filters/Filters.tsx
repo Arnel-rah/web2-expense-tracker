@@ -82,7 +82,7 @@ const Filters: React.FC<FiltersProps> = ({
               const isSelected = selectedCategories.includes(category.name);
               return (
                 <button
-                  key={category.id}
+                  key={category.category_id}
                   onClick={() => handleCategoryToggle(category.name)}
                   className={`p-2 rounded-lg flex items-center justify-center transition-all duration-200 text-sm font-medium ${
                     isSelected ? 'shadow-sm' : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:bg-gray-100'

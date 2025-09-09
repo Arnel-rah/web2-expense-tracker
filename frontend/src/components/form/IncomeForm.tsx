@@ -1,15 +1,30 @@
-import useForm from "../../hooks/useForm";
+import { useEffect } from "react";
+import useForm, { type FormDataBase } from "../../hooks/useForm";
 
-export default function IncomeForm({ existingIncome = null }) {
+interface FormData extends FormDataBase{
+  amount: number;
+  date: string;
+  source: string;
+  description: string;
+  creationDate?: string;
+}
+
+interface IncomeFormProps{
+  existingIncome?: FormData | null;
+  onSuccess?: () => void;
+}
+
+export default function IncomeForm ({ existingIncome = null, onSuccess }: IncomeFormProps) {
   const {
     formData,
+    setFormData,
     handleChange,
     handleSubmit,
     success,
     error,
     loading
-  } = useForm(
-    existingIncome || {
+  } = useForm<FormData>(
+    {
       amount: 0,
       date: '',
       source: '',
@@ -18,9 +33,23 @@ export default function IncomeForm({ existingIncome = null }) {
     '/incomes'
   );
 
+  useEffect(()=>{
+    if(existingIncome){
+      setFormData(existingIncome);
+    }
+  },[existingIncome])
+
+
+  const handleFormSubmit = async (e: React.FormEvent)=>{
+    await handleSubmit(e);
+    if (success && onSuccess){
+      onSuccess();
+    }
+  }
+
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleFormSubmit}
       className="bg-white shadow-2xl w-full max-w-2xl mx-auto mt-8 p-6 rounded-2xl space-y-4"
     >
       <h2 className="text-xl font-semibold text-gray-800 mb-4">

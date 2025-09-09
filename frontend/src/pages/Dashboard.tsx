@@ -1,73 +1,22 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from "../components/layout/Header";
-import MonthlySummary from '../components/dashboard/MonthlySummary';
-import Charts from '../components/dashboard/Charts';
-import Filters from '../components/dashboard/Filters';
-import type { Expense, Income, Category, FiltersProps } from '../types/MonthlySummary.types';
-
-const API_URL = 'http://localhost:8080/api';
+import Charts from '../components/dashboard/Charts/Charts';
+import Filters from '../components/dashboard/Filters/Filters';
+import type { FiltersProps } from '../types/MonthlySummary.types';
+import { useApiData } from '../hooks/useApiData';
+import MonthlySummary from '../components/dashboard/MonthlySummary/MonthlySummary';
+import { useSummary } from '../hooks/useSummary';
 
 const getDefaultDateRange = () => ({
   start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
   end: new Date().toISOString().split('T')[0]
 });
 
-const createAuthHeaders = () => ({
-  'Authorization': `Bearer ${localStorage.getItem('token')}`,
-});
-
-const useApiData = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [incomes, setIncomes] = useState<Income[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  const fetchData = async (endpoint: string) => {
-    const response = await fetch(`${API_URL}/${endpoint}`, {
-      method: 'GET',
-      headers: createAuthHeaders()
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Erreur de récupération des ${endpoint}`);
-    }
-    
-    return response.json();
-  };
-
-  const loadAllData = async () => {
-    try {
-      const [categoriesData, expensesData, incomesData] = await Promise.all([
-        fetchData('categories'),
-        fetchData('expenses'),
-        fetchData('incomes')
-      ]);
-
-      setCategories(categoriesData);
-      setExpenses(expensesData.map((expense: any) => ({
-        ...expense,
-        amount: parseFloat(expense.amount)
-      })));
-      setIncomes(incomesData.map((income: any) => ({
-        ...income,
-        amount: parseFloat(income.amount)
-      })));
-    } catch (error) {
-      console.error('Erreur de chargement des données:', error);
-    }
-  };
-
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  return { expenses, incomes, categories };
-};
-
 const DashboardHeader = ({
-  onToggleFilter 
-}: { 
-  isFilterOpen: boolean; 
-  onToggleFilter: () => void; 
+  onToggleFilter
+}: {
+  isFilterOpen: boolean;
+  onToggleFilter: () => void;
 }) => (
   <div className="mb-8 flex justify-between items-center">
     <div>
@@ -83,11 +32,11 @@ const DashboardHeader = ({
   </div>
 );
 
-const FilterSection = ({ 
-  isOpen, 
+const FilterSection = ({
+  isOpen,
   filterProps
-}: { 
-  isOpen: boolean; 
+}: {
+  isOpen: boolean;
   filterProps: FiltersProps;
 }) => (
   <>
@@ -103,13 +52,22 @@ const FilterSection = ({
 );
 
 export default function Dashboard() {
-  const { expenses, incomes, categories } = useApiData();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
   const defaultDates = getDefaultDateRange();
   const [startDate, setStartDate] = useState(defaultDates.start);
   const [endDate, setEndDate] = useState(defaultDates.end);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const { expenses, incomes, categories } = useApiData();
+
+  const { summary, monthlySummary } = useSummary();
+
+  // useEffect(() => {
+  //   console.log("summary:", summary);
+  //   console.log("expenses:", expenses);
+  //   console.log("incomes:", incomes);
+  //   console.log("date:", startDate + "--->" + endDate);
+  //   console.log("selectedCategories:", selectedCategories);
+  // }, [summary, monthlySummary, expenses, incomes, startDate, endDate, selectedCategories]);
 
   useEffect(() => {
     if (categories.length > 0) {
@@ -133,6 +91,7 @@ export default function Dashboard() {
   };
 
   const dataProps = {
+    summary: monthlySummary,
     expenses,
     incomes,
     startDate,
@@ -144,19 +103,19 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Header />
-      
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+
         <DashboardHeader
           isFilterOpen={isFilterOpen}
           onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-          <FilterSection 
-            isOpen={isFilterOpen} 
-            filterProps={filterProps} 
+          <FilterSection
+            isOpen={isFilterOpen}
+            filterProps={filterProps}
           />
-          
+
           <div className="lg:col-span-3">
             <MonthlySummary {...dataProps} />
           </div>
