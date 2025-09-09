@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Income from './pages/Incomes';
 import Expense from './pages/Expenses';
+import Profile from './pages/Profile';
 
 function App() {
 
@@ -18,7 +19,7 @@ function App() {
           <Route path="/expenses" element={<Expense />} />
           <Route path="/incomes" element={<Income />} />
           <Route path="/categories" element={<></>} />
-          <Route path="/profile" element={<></>} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>
