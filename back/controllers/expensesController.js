@@ -7,7 +7,7 @@ export const getExpenses = async (req, res) => {
 
   let query = `SELECT 
   depense.*,
-  categorie.name AS category_name
+  categorie.name AS category
   FROM depense
   INNER JOIN categorie ON depense.category_id = categorie.category_id
   WHERE depense.user_id = $1;
