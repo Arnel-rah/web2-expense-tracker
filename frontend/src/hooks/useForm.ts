@@ -3,6 +3,8 @@ import { apiFetch } from "../api/api";
 
 export interface FormDataBase {
   id?: number;
+  income_id?: number;
+  expense_id?: number;
 }
 
 export default function useForm<T extends FormDataBase>(
@@ -29,8 +31,14 @@ export default function useForm<T extends FormDataBase>(
     setError(null);
     setLoading(true);
 
-    const isUpdate = !!formData.id; 
-    const endpoint = isUpdate ? `${endpointBase}/${formData.id}` : endpointBase;
+    const getIdForRequest = () => {
+      if (formData.income_id) return formData.income_id;
+      if (formData.expense_id) return formData.expense_id;
+    };
+
+    const resourceId = getIdForRequest();
+    const isUpdate = !!resourceId;
+    const endpoint = isUpdate ? `${endpointBase}/${resourceId}` : endpointBase;
     const method = isUpdate ? "PUT" : "POST";
 
     try {
@@ -47,7 +55,6 @@ export default function useForm<T extends FormDataBase>(
       if (!isUpdate) {
         setFormData(initialValues);
       }
-      
       
       if (onSuccess) {
         onSuccess(); 

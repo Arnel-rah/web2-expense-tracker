@@ -1,8 +1,40 @@
+export const getDefaultDateRange = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date();
+  
+  const formatLocalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  return {
+    start: formatLocalDate(start),
+    end: formatLocalDate(end)
+  };
+};
+
 export const createDateRange = (startDate: string, endDate: string) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  start.setHours(0, 0, 0, 0);
+  const formatDateToMidnight = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const start = formatDateToMidnight(startDate);
+  const end = formatDateToMidnight(endDate);
+  
+  if (startDate === 'first-of-month') {
+    const now = new Date();
+    start.setFullYear(now.getFullYear());
+    start.setMonth(now.getMonth());
+    start.setDate(1);
+  }
+  
   end.setHours(23, 59, 59, 999);
+  
   return { start, end };
 };
 

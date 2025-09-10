@@ -6,11 +6,7 @@ import type { FiltersProps } from '../types/MonthlySummary.types';
 import { useApiData } from '../hooks/useApiData';
 import MonthlySummary from '../components/dashboard/MonthlySummary/MonthlySummary';
 import { useSummary } from '../hooks/useSummary';
-
-const getDefaultDateRange = () => ({
-  start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-  end: new Date().toISOString().split('T')[0]
-});
+import { getDefaultDateRange } from '../utils';
 
 const DashboardHeader = ({
   onToggleFilter
@@ -61,13 +57,17 @@ export default function Dashboard() {
 
   const { summary, monthlySummary } = useSummary();
 
-  // useEffect(() => {
-  //   console.log("summary:", summary);
-  //   console.log("expenses:", expenses);
-  //   console.log("incomes:", incomes);
-  //   console.log("date:", startDate + "--->" + endDate);
-  //   console.log("selectedCategories:", selectedCategories);
-  // }, [summary, monthlySummary, expenses, incomes, startDate, endDate, selectedCategories]);
+  useEffect(() => {
+    console.log(getDefaultDateRange());
+  },[])
+
+  useEffect(() => {
+    console.log("summary:", summary);
+    console.log("expenses:", expenses);
+    // console.log("incomes:", incomes);
+    // console.log("date:", startDate + "--->" + endDate);
+    // console.log("selectedCategories:", selectedCategories);
+  }, [summary, monthlySummary, expenses, incomes, startDate, endDate, selectedCategories]);
 
   useEffect(() => {
     if (categories.length > 0) {

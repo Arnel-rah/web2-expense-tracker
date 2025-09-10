@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import useForm, { type FormDataBase } from "../../hooks/useForm";
 import useGlobalFetch from "../../hooks/useGlobalFetch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,13 +7,14 @@ import { faFile, faUpload } from "@fortawesome/free-solid-svg-icons";
 interface FormData extends FormDataBase {
   amount: number;
   date: string;
-  categoryId: number;
+  categoryId: number | string;
   description: string;
   type: string;
   startDate: string;
   endDate: string;
   receipt: File | null;
   creationDate?: string;
+  newCategory?: string;
 }
 
 interface Category {
@@ -23,12 +24,14 @@ interface Category {
 
 interface ExpenseFormProps {
   existingExpense?: FormData | null;
-  onSuccess?: () => void; 
+  onSuccess?: () => void;
 }
 
 export default function ExpenseForm({ existingExpense = null, onSuccess }: ExpenseFormProps) {
   const [isRecurring, setIsRecurring] = useState(false);
-
+  // const [categoriesData, setCategoriesData] = useState<Category[]>([])
+  
+  
   const {
     formData,
     setFormData,
@@ -47,7 +50,8 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
       receipt: null,
       creationDate: new Date().toISOString().split('T')[0],
       startDate: '',
-      endDate: ''
+      endDate: '',
+      newCategory: ''
     },
     '/expenses',
     onSuccess
@@ -59,10 +63,21 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
       setIsRecurring(existingExpense.type === "recurring");
     }
   }, [existingExpense, setFormData]);
-
+  
   const categories = useGlobalFetch("categories");
   const categoriesData: Category[] = categories.data || [];
+  const newCategoryId = categoriesData.length
+  ? Math.max(...categoriesData.map((c) => parseInt(c.id))) + 1
+  : 1;
 
+
+const newCategory = {
+  id: newCategoryId,
+  name: formData.newCategory
+};
+
+// categoriesData.push(newCategory)
+  
   const handleFormSubmit = async (e: React.FormEvent) => {
     await handleSubmit(e);
     if (success && onSuccess) {
@@ -124,7 +139,20 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
               {category.name}
             </option>
           ))}
+          <option value={newCategoryId}>+ Add new category</option>
         </select>
+
+        {formData.categoryId == newCategoryId && (
+          <input
+            type="text"
+            name="newCategory"
+            required
+            placeholder="Enter new category"
+            value={formData.newCategory}
+            onChange={handleChange}
+            className="mt-2 border border-gray-300 rounded-lg p-2 w-full"
+          />
+        )}
       </div>
 
       <div className="flex flex-col">
