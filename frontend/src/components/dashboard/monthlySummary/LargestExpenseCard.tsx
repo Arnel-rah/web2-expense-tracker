@@ -1,8 +1,8 @@
 import React from 'react';
-import type { FinancialItem } from '../../../types/MonthlySummary.types.ts';
+import type { Expense } from '../../../types';
 
 export interface LargestExpenseCardProps {
-  largestExpense: FinancialItem;
+  largestExpense: Expense;
 }
 
 export const LargestExpenseCard: React.FC<LargestExpenseCardProps> = ({ largestExpense }) => (

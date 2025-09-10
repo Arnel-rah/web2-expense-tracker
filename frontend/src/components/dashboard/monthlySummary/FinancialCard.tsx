@@ -11,7 +11,7 @@ const THEMES = {
 
 export interface FinancialCardProps {
   title: string;
-  amount: number;
+  amount: number | string;
   count?: number;
   theme: keyof typeof THEMES;
   itemName?: string;

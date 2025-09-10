@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "dev:server": "node ./back/server.js",
+    "dev:server": "cd back && node ./server.js",
     "dev:client": "cd frontend && npm run dev",
-    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\""
+    "dev:all": "start-app.bat && concurrently \"npm run dev:client\" \"npm run dev:server\" --names \"CLIENT,SERVER\" --prefix-colors \"blue,yellow\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

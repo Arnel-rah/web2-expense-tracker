@@ -1,12 +1,13 @@
 import React from 'react';
 import Button from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { storageService } from '../../services/storage.service';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    storageService.clearAuth();
     navigate("/login");
   }
 

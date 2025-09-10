@@ -1,10 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Auth from './pages/auth/Auth';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Income from './pages/Incomes';
 import Expense from './pages/Expenses';
 import Profile from './pages/Profile';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { Toast } from './components/ui/Toast';
 
 function App() {
 
@@ -15,12 +17,50 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/expenses" element={<Expense />} />
-          <Route path="/incomes" element={<Income />} />
-          <Route path="/categories" element={<></>} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses"
+            element={
+              <ProtectedRoute>
+                <Expense />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/incomes"
+            element={
+              <ProtectedRoute>
+                <Income />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute>
+                <></>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+        </Routes> 
+
+        <Toast />
+        
       </div>
     </Router>
   );

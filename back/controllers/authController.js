@@ -6,7 +6,7 @@ import { createUser, findUserByEmail } from "../models/userModel.js";
 // Inscription
 export const signup = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
 
     // Vérifier si l'email existe déjà
     const existingUser = await findUserByEmail(email);

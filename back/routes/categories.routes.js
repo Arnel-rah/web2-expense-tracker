@@ -6,9 +6,9 @@ import { authenticate } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.use(logRequest);
-router.get('/', authenticate, getCategories);
-router.post('/', authenticate, createCategory);
-router.put('/:id', authenticate, updateCategory);
-router.delete('/:id', authenticate, deleteCategory);
+router.get('/', authenticate, getCategories);//verifié
+router.post('/', authenticate, createCategory);//verifié
+router.put('/:id', authenticate, updateCategory);//verifié
+router.delete('/:id', authenticate, deleteCategory);//verifié
 
 export default router;

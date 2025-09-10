@@ -6,6 +6,6 @@ import { authenticate } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.use(logRequest);
-router.get('/', authenticate, getProfile);
+router.get('/', authenticate, getProfile);//verifié
 
 export default router;

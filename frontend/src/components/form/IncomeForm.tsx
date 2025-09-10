@@ -30,8 +30,7 @@ export default function IncomeForm ({ existingIncome = null, onSuccess }: Income
       source: '',
       description: ''
     },
-    '/incomes',
-    onSuccess
+    '/incomes'
   );
 
   useEffect(()=>{
