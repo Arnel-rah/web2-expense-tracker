@@ -20,7 +20,7 @@ interface ListProps {
 export default function List({ data, transaction, loading, err, onEdit, onDelete }: ListProps) {
   const columnsToShow = transaction === "income"
     ? ['amount', 'date', 'source', 'description']
-    : ['amount', 'date', 'category_id', 'description', 'type', 'expense_id'];
+    : ['amount', 'date', 'category_name', 'description', 'type', 'expense_id'];
 
   const idKey = transaction === "income" ? "income_id" : "expense_id";
 
