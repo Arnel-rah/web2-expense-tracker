@@ -4,6 +4,8 @@ import { faTrash, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 interface DataRow {
   [key: string]: any;
   id?: number | string;
+  income_id?: number | string;
+  expense_id?: number | string;
 }
 
 interface ListProps {
@@ -11,16 +13,18 @@ interface ListProps {
   transaction: string;
   loading: boolean;
   err: string | null;
-  onEdit?: (row: DataRow) => void; 
-  onDelete?: (id: number | string) => void; 
+  onEdit?: (row: DataRow) => void;
+  onDelete?: (id: number | string) => void;
 }
 
 export default function List({ data, transaction, loading, err, onEdit, onDelete }: ListProps) {
-  const columnsToShow = transaction === "income" 
-    ? ['amount', 'date', 'source', 'description'] 
-    : ['amount', 'date', 'categoryId', 'description', 'type'];
-  
-  const keysToDisplay = data && data.length > 0 
+  const columnsToShow = transaction === "income"
+    ? ['amount', 'date', 'source', 'description']
+    : ['amount', 'date', 'category_id', 'description', 'type', 'expense_id'];
+
+  const idKey = transaction === "income" ? "income_id" : "expense_id";
+
+  const keysToDisplay = data && data.length > 0
     ? Object.keys(data[0]).filter((key) => columnsToShow.includes(key))
     : [];
 
@@ -61,14 +65,14 @@ export default function List({ data, transaction, loading, err, onEdit, onDelete
                   ))}
                   <td className="text-center">
                     <button
-                      onClick={() => onEdit && onEdit(row)} 
+                      onClick={() => onEdit && onEdit(row)}
                       className="text-blue-500 hover:text-blue-700 mr-2"
                       title="Edit"
                     >
                       <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
                     <button
-                      onClick={() => onDelete && onDelete(row.id)} 
+                      onClick={() => onDelete && onDelete(row[idKey] || '')}
                       className="text-red-500 hover:text-red-700"
                       title="Delete"
                     >
