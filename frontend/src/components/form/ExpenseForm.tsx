@@ -3,8 +3,10 @@ import useForm, { type FormDataBase } from "../../hooks/useForm";
 import useGlobalFetch from "../../hooks/useGlobalFetch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { apiFetch } from "../../api/api";
 
 interface FormData extends FormDataBase {
+  expense_id?: number;
   amount: number;
   date: string;
   categoryId: number | string;
@@ -29,17 +31,15 @@ interface ExpenseFormProps {
 
 export default function ExpenseForm({ existingExpense = null, onSuccess }: ExpenseFormProps) {
   const [isRecurring, setIsRecurring] = useState(false);
-  // const [categoriesData, setCategoriesData] = useState<Category[]>([])
-  
-  
+  const [localError, setLocalError] = useState("");
+  const [localSuccess, setLocalSuccess] = useState("");
+
   const {
     formData,
     setFormData,
     handleChange,
-    handleSubmit,
     success,
     error,
-    loading
   } = useForm<FormData>(
     {
       amount: 0,
@@ -63,25 +63,56 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
       setIsRecurring(existingExpense.type === "recurring");
     }
   }, [existingExpense, setFormData]);
-  
+
   const categories = useGlobalFetch("categories");
   const categoriesData: Category[] = categories.data || [];
-  const newCategoryId = categoriesData.length
-  ? Math.max(...categoriesData.map((c) => parseInt(c.id))) + 1
-  : 1;
 
 
-const newCategory = {
-  id: newCategoryId,
-  name: formData.newCategory
-};
-
-// categoriesData.push(newCategory)
-  
   const handleFormSubmit = async (e: React.FormEvent) => {
-    await handleSubmit(e);
-    if (success && onSuccess) {
-      onSuccess();
+    e.preventDefault();
+    setLocalError("");
+    setLocalSuccess("");
+
+    let finalCategoryId: number = Number(formData.categoryId);
+
+    if (formData.categoryId === "new" && formData.newCategory) {
+      try {
+        const newCat = await apiFetch("/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: formData.newCategory }),
+        });
+        finalCategoryId = newCat.category_id; 
+      } catch {
+        setLocalError("Failed to create category");
+        return;
+      }
+    }
+
+    const apiData = {
+      amount: String(formData.amount),
+      date: formData.date,
+      category_id: finalCategoryId,
+      description: formData.description,
+      type: formData.type,
+      start_date: formData.startDate || null,
+      end_date: formData.endDate || null,
+    };
+
+    try {
+      const method = formData.expense_id ? "PUT" : "POST";
+      const endpoint = formData.expense_id ? `/expenses/${formData.expense_id}` : "/expenses";
+
+      await apiFetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(apiData),
+      });
+
+      setLocalSuccess("Expense submitted successfully");
+      if (onSuccess) onSuccess();
+    } catch {
+      setLocalError("Failed to submit expense");
     }
   };
 
@@ -91,7 +122,7 @@ const newCategory = {
       className="bg-white shadow-2xl w-full max-w-2xl mx-auto mt-8 p-6 rounded-2xl space-y-4"
     >
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
-        {formData.id ? "Edit Expense" : "Add Expense"}
+        {formData.expense_id ? "Edit Expense" : "Add Expense"}
       </h2>
 
       <div className="flex flex-col">
@@ -135,14 +166,12 @@ const newCategory = {
         >
           <option value="">Select a category</option>
           {categoriesData.map((category: Category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
+            <option key={category.id} value={category.id}>{category.name}</option>
           ))}
-          <option value={newCategoryId}>+ Add new category</option>
+          <option value="new">+ Add new category</option>
         </select>
 
-        {formData.categoryId == newCategoryId && (
+        {formData.categoryId === "new" && (
           <input
             type="text"
             name="newCategory"
@@ -247,21 +276,14 @@ const newCategory = {
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
-          {formData.id ? "Update" : "Add"}
+          {formData.expense_id ? "Update" : "Add"}
         </button>
       </div>
 
-      {success && (
-        <p className="mt-4 text-green-700 text-sm font-medium bg-green-100 p-2 rounded">
-          {success}
-        </p>
-      )}
-
-      {error && (
-        <p className="mt-4 text-red-700 text-sm font-medium bg-red-100 p-2 rounded">
-          {error}
-        </p>
-      )}
+      {success && <p className="mt-4 text-green-700 text-sm font-medium bg-green-100 p-2 rounded">{success}</p>}
+      {error && <p className="mt-4 text-red-700 text-sm font-medium bg-red-100 p-2 rounded">{error}</p>}
+      {localError && <p className="mt-4 text-red-700 text-sm font-medium bg-red-100 p-2 rounded">{localError}</p>}
+      {localSuccess && <p className="mt-4 text-green-700 text-sm font-medium bg-green-100 p-2 rounded">{localSuccess}</p>}
     </form>
   );
 }
