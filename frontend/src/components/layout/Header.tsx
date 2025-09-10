@@ -12,26 +12,46 @@ const Header: React.FC = () => {
   }
 
   return (
-    <header className="bg-white shadow">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <div className="flex items-center text-3xl font-bold text-gray-900">
-          <p>Exp</p>
-          <img src="expense-logo.png" alt="expense-logo" className='size-15' />
-          <p className='flex flex-col'>nse <span className='text-xs'>Tracker</span></p>
-        </div>
-
-        <div className="flex items-center gap-15 text-gray-600">
-          <div className='flex items-center gap-5 font-semibold text-xl'>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/dashboard")}>Dashboard</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/expenses")}>Expense</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/incomes")}>Income</p>
-            <p className='cursor-pointer hover:border-b-5 h-full border-gray-300 transition-all duration-200' onClick={() => navigate("/profile")}>Profile</p>
-          </div>
-          <Button onClick={handleLogout}>Logout</Button>
-        </div>
+  <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto py-4 px-6 flex justify-between items-center">
+      <div className="flex items-center gap-2 text-2xl font-extrabold text-gray-900">
+        <p className="tracking-tight">Exp</p>
+        <img src="expense-logo.png" alt="expense-logo" className="w-10 h-10 drop-shadow-sm" />
+        <p className="flex flex-col leading-none">
+          nse <span className="text-xs font-medium text-blue-600">Tracker</span>
+        </p>
       </div>
-    </header>
-  );
+
+      <nav className="hidden md:flex items-center gap-10 font-semibold text-gray-700">
+        {[
+          { name: "Dashboard", path: "/dashboard" },
+          { name: "Expense", path: "/expenses" },
+          { name: "Income", path: "/incomes" },
+          { name: "Profile", path: "/profile" },
+        ].map((item) => (
+          <p
+            key={item.name}
+            className="cursor-pointer relative group transition-all"
+            onClick={() => navigate(item.path)}
+          >
+            {item.name}
+            <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+          </p>
+        ))}
+      </nav>
+
+      <div className="flex items-center gap-4">
+        <Button
+          onClick={handleLogout}
+          className="bg-blue-600 text-white px-5 py-2.4 rounded-lg shadow-md hover:bg-blue-700 transition-colors"
+        >
+          Logout
+        </Button>
+      </div>
+    </div>
+  </header>
+);
+
 };
 
 export default Header;
