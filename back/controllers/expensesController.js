@@ -27,7 +27,13 @@ export const getExpenses = async (req, res) => {
 
   try {
     const result = await pool.query(query, values);
-    res.json(result.rows);
+
+    const formatted = result.rows.map(row => ({
+      ...row,
+      date: row.date ? row.date.toISOString().split("T")[0] : null
+    }));
+
+    res.json(formatted);
   } catch (error) {
     res.status(500).json({ message: 'Error getting expenses', error: error.message });
   }
