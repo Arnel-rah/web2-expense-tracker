@@ -11,13 +11,13 @@ export const useFinancialCalculations = (
   selectedCategories: string[]
 ): FinancialCalculations => {
   return useMemo(() => {
-    console.log('Calculating financial data...', {
-      expensesCount: expenses.length,
-      incomesCount: incomes.length,
-      startDate,
-      endDate,
-      selectedCategoriesCount: selectedCategories.length
-    });
+    // console.log('Calculating financial data...', {
+    //   expensesCount: expenses.length,
+    //   incomesCount: incomes.length,
+    //   startDate,
+    //   endDate,
+    //   selectedCategoriesCount: selectedCategories.length
+    // });
 
     const dateRange = createDateRange(startDate, endDate);
     if (!dateRange) {
@@ -64,16 +64,16 @@ export const useFinancialCalculations = (
     const isOverBudget = totalExpenses > totalIncome;
     const overBudgetAmount = Math.max(0, totalExpenses - totalIncome);
 
-    console.log('Financial calculations result:', {
-      totalIncome,
-      totalExpenses,
-      balance,
-      savingsRate: savingsRate.toFixed(2),
-      expenseRate: expenseRate.toFixed(2),
-      largestExpenseAmount: largestExpense?.amount || 0,
-      isOverBudget,
-      overBudgetAmount
-    });
+    // console.log('Financial calculations result:', {
+    //   totalIncome,
+    //   totalExpenses,
+    //   balance,
+    //   savingsRate: savingsRate.toFixed(2),
+    //   expenseRate: expenseRate.toFixed(2),
+    //   largestExpenseAmount: largestExpense?.amount || 0,
+    //   isOverBudget,
+    //   overBudgetAmount
+    // });
 
     return {
       filteredIncomes,
