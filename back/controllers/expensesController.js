@@ -5,7 +5,13 @@ export const getExpenses = async (req, res) => {
   const { start, end, category, type } = req.query;
   const userId = req.userId;
 
-  let query = 'SELECT * FROM depense WHERE user_id = $1';
+  let query = `SELECT 
+  depense.*,
+  categorie.name AS category_name
+  FROM depense
+  INNER JOIN categorie ON depense.category_id = categorie.category_id
+  WHERE depense.user_id = $1;
+`
   const values = [userId];
 
   if (start) {
