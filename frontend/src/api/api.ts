@@ -6,10 +6,10 @@ export async function apiFetch(endpoint: string, options = {}) {
     window.location.href = '/login';
     return; 
   }
+  
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
   };
 
   const config = {
