@@ -61,13 +61,13 @@ export default function Dashboard() {
     console.log(getDefaultDateRange());
   },[])
 
-  // useEffect(() => {
-  //   console.log("summary:", summary);
-  //   console.log("expenses:", expenses);
-  //   console.log("incomes:", incomes);
-  //   console.log("date:", startDate + "--->" + endDate);
-  //   console.log("selectedCategories:", selectedCategories);
-  // }, [summary, monthlySummary, expenses, incomes, startDate, endDate, selectedCategories]);
+  useEffect(() => {
+    console.log("summary:", summary);
+    console.log("expenses:", expenses);
+    // console.log("incomes:", incomes);
+    // console.log("date:", startDate + "--->" + endDate);
+    // console.log("selectedCategories:", selectedCategories);
+  }, [summary, monthlySummary, expenses, incomes, startDate, endDate, selectedCategories]);
 
   useEffect(() => {
     if (categories.length > 0) {

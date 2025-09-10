@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+import { API_BASE_URL } from "../constants/api";
 
 export async function apiFetch(endpoint: string, options = {}) {
   const token = localStorage.getItem('token');
@@ -17,7 +17,7 @@ export async function apiFetch(endpoint: string, options = {}) {
     headers,
   };
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
   if (!response.ok) {
     if (response.status === 401) {
