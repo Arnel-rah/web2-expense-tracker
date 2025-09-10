@@ -6,10 +6,11 @@ export const getIncomes = async (req, res) => {
   const { start, end } = req.query;
   const token = req.headers.authorization?.split(' ')[1];
   const userId = jwt.verify(token, config.jwtSecret).userId;
+
   let query = 'SELECT * FROM revenu WHERE user_id = $1';
   const values = [userId];
 
-    if (start) {
+  if (start) {
     query += ' AND date >= $' + (values.length + 1);
     values.push(new Date(start));
   }
@@ -20,9 +21,14 @@ export const getIncomes = async (req, res) => {
 
   try {
     const result = await pool.query(query, values);
-    res.json(result.rows);
+    const formatted = result.rows.map(row => ({
+      ...row,
+      date: row.date ? row.date.toISOString().split("T")[0] : null
+    }));
+
+    res.json(formatted);
   } catch (error) {
-    res.status(500).json({ message: 'Error getting incomes' });
+    res.status(500).json({ message: 'Error getting incomes', error: error.message });
   }
 };
 
