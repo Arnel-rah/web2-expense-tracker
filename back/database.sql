@@ -1,6 +1,9 @@
 -- ============================
 -- Table: utilisateur
 -- ============================
+drop database expense_tracker;
+create database expense_tracker;
+\c expense_tracker
 CREATE TABLE utilisateur (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(150) NOT NULL UNIQUE,

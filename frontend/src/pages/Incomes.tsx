@@ -18,7 +18,7 @@ export default function Income() {
     const handleDelete = async (id: number | string) => {
         if (confirm("Are you sure you want to dele this income?")) {
             try {
-                await apiFetch(`/expenses/${id}`, { method: "DELETE" });
+                await apiFetch(`/incomes/${id}`, { method: "DELETE" });
                 refetch();
             } catch (err) {
                 console.error("Delete error:", err);
