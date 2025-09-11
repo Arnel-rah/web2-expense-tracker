@@ -4,6 +4,7 @@ import useGlobalFetch from "../../hooks/useGlobalFetch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../api/api";
+import toast from "react-hot-toast";
 
 interface FormData extends FormDataBase {
   expense_id?: number;
@@ -20,7 +21,7 @@ interface FormData extends FormDataBase {
 }
 
 interface Category {
-  id: string | number;
+  category_id: string | number;
   name: string;
 }
 
@@ -31,15 +32,11 @@ interface ExpenseFormProps {
 
 export default function ExpenseForm({ existingExpense = null, onSuccess }: ExpenseFormProps) {
   const [isRecurring, setIsRecurring] = useState(false);
-  const [localError, setLocalError] = useState("");
-  const [localSuccess, setLocalSuccess] = useState("");
 
   const {
     formData,
     setFormData,
     handleChange,
-    success,
-    error,
   } = useForm<FormData>(
     {
       amount: 0,
@@ -66,12 +63,8 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
 
   const categories = useGlobalFetch("categories");
   const categoriesData: Category[] = categories.data || [];
-
-
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLocalError("");
-    setLocalSuccess("");
 
     let finalCategoryId: number = Number(formData.categoryId);
 
@@ -82,9 +75,9 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: formData.newCategory }),
         });
-        finalCategoryId = newCat.category_id; 
+        finalCategoryId = newCat.category_id;
       } catch {
-        setLocalError("Failed to create category");
+        toast.error("Failed to create category");
         return;
       }
     }
@@ -109,10 +102,10 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
         body: JSON.stringify(apiData),
       });
 
-      setLocalSuccess("Expense submitted successfully");
+      toast.success("Expense submitted successfully")
       if (onSuccess) onSuccess();
     } catch {
-      setLocalError("Failed to submit expense");
+      toast.error("Failed to submit expense");
     }
   };
 
@@ -166,8 +159,9 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
         >
           <option value="">Select a category</option>
           {categoriesData.map((category: Category) => (
-            <option key={category.id} value={category.id}>{category.name}</option>
+            <option key={category.category_id} value={category.category_id}>{category.name}</option>
           ))}
+
           <option value="new">+ Add new category</option>
         </select>
 
@@ -279,11 +273,6 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           {formData.expense_id ? "Update" : "Add"}
         </button>
       </div>
-
-      {success && <p className="mt-4 text-green-700 text-sm font-medium bg-green-100 p-2 rounded">{success}</p>}
-      {error && <p className="mt-4 text-red-700 text-sm font-medium bg-red-100 p-2 rounded">{error}</p>}
-      {localError && <p className="mt-4 text-red-700 text-sm font-medium bg-red-100 p-2 rounded">{localError}</p>}
-      {localSuccess && <p className="mt-4 text-green-700 text-sm font-medium bg-green-100 p-2 rounded">{localSuccess}</p>}
     </form>
   );
 }
