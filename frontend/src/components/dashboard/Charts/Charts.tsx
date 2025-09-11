@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -25,12 +25,29 @@ interface ChartsProps {
   categories: Category[];
 }
 
-const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, selectedCategories, categories }) => {
-  const { periodIncome, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
+const Charts: React.FC<ChartsProps> = ({
+  expenses,
+  incomes,
+  startDate,
+  endDate,
+  selectedCategories,
+  categories
+}) => {
+  useEffect(() => {
+    console.log(expenses);
+    console.log(incomes);
+    console.log(startDate, endDate);
+    console.log(selectedCategories);
+    console.log(categories);
+    /**
+     * Soit expense de type
+     */
+  }, [expenses, incomes, startDate, endDate, selectedCategories, categories])
+  const { periodIncomes, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    const periodIncome = incomes
+    const periodIncomes = incomes
       .filter(income => {
         const incomeDate = new Date(income.date);
         return incomeDate >= start && incomeDate <= end;
@@ -41,7 +58,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
       .filter(expense => {
         const expenseDate = new Date(expense.date);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
-        const matchesCategory = selectedCategories.length === 0 || 
+        const matchesCategory = selectedCategories.length === 0 ||
           (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
@@ -51,7 +68,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
       .filter(expense => {
         const expenseDate = new Date(expense.date);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
-        const matchesCategory = selectedCategories.length === 0 || 
+        const matchesCategory = selectedCategories.length === 0 ||
           (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
@@ -74,16 +91,16 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
     };
 
     return {
-      periodIncome,
+      periodIncomes,
       periodExpenses,
-      periodBalance: periodIncome - periodExpenses,
+      periodBalance: periodIncomes - periodExpenses,
       categoryData,
       lastSixMonths: getLastSixMonths()
     };
   }, [expenses, incomes, startDate, endDate, selectedCategories]);
 
   const categoryColors = useMemo(() => [
-    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', 
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
     '#FF6384', '#C9CBCF', '#7CFC00', '#20B2AA', '#FF00FF', '#00FFFF',
     '#FFD700', '#ADFF2F', '#FF4500', '#DA70D6', '#00BFFF', '#FF6347',
     '#40E0D0', '#EE82EE', '#F5DEB3', '#00FA9A', '#FF69B4', '#BA55D3'
@@ -91,6 +108,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
 
   const doughnutData = useMemo(() => {
     const labels = Object.keys(categoryData);
+    
     return {
       labels,
       datasets: [{
@@ -221,7 +239,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
             <p className="text-sm text-gray-600 text-center">Visualisation par catégories</p>
           </div>
           <div className="h-80 bg-white rounded-xl p-4 shadow-inner">
-            {hasExpenseData ? <Doughnut data={doughnutData} options={doughnutOptions} /> : 
+            {hasExpenseData ? <Doughnut data={doughnutData} options={doughnutOptions} /> :
               <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl">
                 <div className="text-6xl mb-4">📊</div>
                 <p className="text-gray-500 text-center font-medium">Aucune donnée de dépenses pour cette période</p>
@@ -261,7 +279,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
             <p className="text-sm text-gray-600 text-center">Évolution sur 6 mois</p>
           </div>
           <div className="h-80 bg-white rounded-xl p-4 shadow-inner">
-            {hasBarData ? <Bar data={barData} options={barOptions} /> : 
+            {hasBarData ? <Bar data={barData} options={barOptions} /> :
               <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl">
                 <div className="text-6xl mb-4">📈</div>
                 <p className="text-gray-500 text-center font-medium">Aucune donnée disponible pour l'historique</p>
@@ -280,7 +298,7 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
                   <span className="text-lg">💰</span>
                   Revenus
                 </div>
-                <div className="text-green-900 font-extrabold text-xl mt-1">Ar {periodIncome.toLocaleString('fr-FR')}</div>
+                <div className="text-green-900 font-extrabold text-xl mt-1">Ar {periodIncomes.toLocaleString('fr-FR')}</div>
               </div>
               <div className="bg-gradient-to-br from-red-100 to-rose-200 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div className="text-red-800 font-bold flex items-center gap-1">

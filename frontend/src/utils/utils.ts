@@ -2,6 +2,9 @@
 //   const now = new Date();
 //   const start = new Date(now.getFullYear(), now.getMonth(), 1);
 //   const end = new Date();
+
+import type { Category } from "../types";
+
   
 //   const formatLocalDate = (date: Date) => {
 //     const year = date.getFullYear();
@@ -54,6 +57,16 @@ export const getDefaultDateRange = () => {
 export const isInDateRange = (date: string, start: Date, end: Date) => {
   const itemDate = new Date(date);
   return itemDate >= start && itemDate <= end;
+};
+
+// export const getCategoryNameById = (categoryId: number, categories: Category[]): string => {
+//   const category = categories.find(cat => cat.category_id === categoryId);
+//   return category?.name || `Catégorie ${categoryId}`;
+// };
+
+export const getCategoryName = (categoryId: number, categories: Category[]): string => {
+  const category = categories.find(cat => cat.category_id === categoryId);
+  return category?.name || 'Non catégorisé';
 };
 
 export const formatPeriod = (startDate: string, endDate: string) => {

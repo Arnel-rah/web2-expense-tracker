@@ -11,17 +11,7 @@ export interface DataProps {
   categories: Category[];
 }
 
-export interface DataPropsInput {
-  summary: SummaryForm;
-  expenses: Expense[];
-  incomes: Income[];
-  startDate: string;
-  endDate: string;
-  selectedCategories: Number[];
-  categories: Category[];
-}
-
-export const getDataProps = (input: DataPropsInput): DataProps => {
+export const getDataProps = (input: DataProps) => {
   const {
     summary,
     expenses,
@@ -75,7 +65,7 @@ export const getDataProps = (input: DataPropsInput): DataProps => {
   };
 };
 
-export const useDataProps = (input: DataPropsInput): DataProps => {
+export const useDataProps = (input: DataProps) => {
   return useMemo(() => {
     return getDataProps(input);
   }, [

@@ -20,11 +20,11 @@ export interface FinancialItem {
 }
 
 export interface MonthlySummaryProps {
-  summary?: {
+  summary: {
     total_income: number;
     total_expenses: number;
     totalExpenses: number;
-    totalIncome: number;
+    totalIncomes: number;
     balance: number;
   };
   expenses: Expense[];
@@ -32,17 +32,5 @@ export interface MonthlySummaryProps {
   startDate: string;
   endDate: string;
   selectedCategories: Number[];
+  categories: Category[];
 }
-
-// export interface FinancialCalculations {
-//   filteredIncomes: Income[];
-//   filteredExpenses: Expense[];
-//   totalIncome: number;
-//   totalExpenses: number;
-//   balance: number;
-//   savingsRate: number;
-//   expenseRate: number;
-//   largestExpense: Expense | null;
-//   isOverBudget: boolean;
-//   overBudgetAmount: number;
-// }

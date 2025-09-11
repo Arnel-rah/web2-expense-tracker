@@ -11,7 +11,7 @@ export interface BudgetAlertProps {
   isOverBudget: boolean;
   expenseRate: number;
   overBudgetAmount: number;
-  totalIncome: number;
+  totalIncomes: number;
   totalExpenses: number;
 }
 
@@ -19,7 +19,7 @@ export const BudgetAlert: React.FC<BudgetAlertProps> = ({
   isOverBudget, 
   expenseRate, 
   overBudgetAmount, 
-  totalIncome, 
+  totalIncomes, 
   totalExpenses 
 }) => {
   const alertTheme = isOverBudget ? 'alert' : 'yellow';
@@ -38,7 +38,7 @@ export const BudgetAlert: React.FC<BudgetAlertProps> = ({
               : `Vos dépenses représentent ${expenseRate.toFixed(1)}% de vos revenus`}
           </p>
           <div className="text-sm opacity-80 mt-2">
-            Revenus: Ar {totalIncome.toLocaleString('fr-FR')} | Dépenses: Ar {totalExpenses.toLocaleString('fr-FR')}
+            Revenus: Ar {totalIncomes.toLocaleString('fr-FR')} | Dépenses: Ar {totalExpenses.toLocaleString('fr-FR')}
           </div>
         </div>
       </div>
