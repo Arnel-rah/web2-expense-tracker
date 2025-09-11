@@ -13,6 +13,7 @@ import {
   faTimesCircle,
   faLightbulb
 } from "@fortawesome/free-solid-svg-icons";
+import { Loader } from "../components/ui/Loader";
 
 interface UserProfile {
   email: string;
@@ -73,12 +74,12 @@ export default function Profile() {
     }
   };
 
-  if (loading) {
+  if (true) {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-lg">Loading profile...</div>
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+          <Loader />
         </div>
       </>
     );

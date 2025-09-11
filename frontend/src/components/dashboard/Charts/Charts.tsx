@@ -33,18 +33,6 @@ const Charts: React.FC<ChartsProps> = ({
   selectedCategories,
   categories
 }) => {
-  useEffect(() => {
-    console.log(expenses);
-    console.log(incomes);
-    console.log(startDate, endDate);
-    console.log(selectedCategories);
-    console.log(categories);
-    /**
-     * Soit expense de type
-     */
-  }, [expenses, incomes, startDate, endDate, selectedCategories, categories])
-  console.log(startDate);
-
   const { periodIncomes, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -82,8 +70,6 @@ const Charts: React.FC<ChartsProps> = ({
         }
         return acc;
       }, {} as Record<string, number>);
-
-    console.log("CATEGORY - DATA", categoryData);
 
     const getLastSixMonths = () => {
       const months = [];
