@@ -52,17 +52,28 @@ export default function Profile() {
         body: JSON.stringify({ currentPassword, newPassword }),
       });
 
+<<<<<<< HEAD
       toast.success("Password changed successfully!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
       toast.error(err.message || "Feature not available. Please contact support.");
+=======
+      setSuccess("Password changed successfully!");
+      toast.success(success)
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: unknown) {
+      setError(err.message || "Feature not available. Please contact support.");
+>>>>>>> 85ad8075e0ffe4e0daed67605e51d1b66659316f
     } finally {
       setPasswordLoading(false);
     }
   };
 
+<<<<<<< HEAD
   if (loading) {
     return (
       <>
@@ -74,6 +85,8 @@ export default function Profile() {
     );
   }
 
+=======
+>>>>>>> 85ad8075e0ffe4e0daed67605e51d1b66659316f
   return (
     <>
       <Header />
@@ -84,6 +97,16 @@ export default function Profile() {
             User Profile
           </h1>
 
+<<<<<<< HEAD
+=======
+          {error && (
+            <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm mb-4">
+              <FontAwesomeIcon icon={faTimesCircle} className="mr-2" />
+              {error}
+            </div>
+          )}
+
+>>>>>>> 85ad8075e0ffe4e0daed67605e51d1b66659316f
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
