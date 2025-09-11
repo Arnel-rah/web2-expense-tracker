@@ -11,7 +11,7 @@ import {
   Legend,
 } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faChartPie, faHistory } from '@fortawesome/free-solid-svg-icons';
 import type { ChartsProps, Expense, Income } from '../../../types';
 import { Statistics } from './StatisticPeriodes';
 
@@ -45,8 +45,8 @@ const Charts: React.FC<ChartsProps> = ({
         return matchesPeriod && matchesCategory;
       })
       .reduce((sum, expense) => sum + Number(expense.amount), 0);
-    
-      const categoryData = expenses
+
+    const categoryData = expenses
       .filter(expense => {
         const expenseDate = new Date(expense.created_at);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
@@ -210,7 +210,9 @@ const Charts: React.FC<ChartsProps> = ({
         <div>
           <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 mb-4">
             <h3 className="text-xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2">
-              <span className="text-2xl">🥧</span>
+              <span className="text-2xl">
+                <FontAwesomeIcon icon={faChartPie} />
+              </span>
               Répartition des Dépenses
             </h3>
             <p className="text-sm text-gray-600 text-center">Visualisation par catégories</p>
@@ -249,7 +251,9 @@ const Charts: React.FC<ChartsProps> = ({
         <div>
           <div className="bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl p-4 mb-4">
             <h3 className="text-xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2">
-              <span className="text-2xl">📈</span>
+              <span className="text-2xl">
+                <FontAwesomeIcon icon={faHistory} />
+              </span>
               Historique des Finances
             </h3>
             <p className="text-sm text-gray-600 text-center">Évolution sur 6 mois</p>
@@ -263,11 +267,11 @@ const Charts: React.FC<ChartsProps> = ({
             }
           </div>
 
-            <Statistics
-              periodIncomes={periodIncomes}
-              periodExpenses={periodExpenses}
-              periodBalance={periodBalance}
-            />
+          <Statistics
+            periodIncomes={periodIncomes}
+            periodExpenses={periodExpenses}
+            periodBalance={periodBalance}
+          />
         </div>
       </div>
     </div>
