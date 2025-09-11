@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import type { FiltersProps } from '../../types/MonthlySummary.types';
+import type { FiltersProps } from '../../../types/';
 
 const Filters: React.FC<FiltersProps> = ({
   startDate,
@@ -14,10 +14,10 @@ const Filters: React.FC<FiltersProps> = ({
 }) => {
   const [allSelected, setAllSelected] = useState(true);
 
-  const handleCategoryToggle = (categoryName: string) => {
-    const newCategories = selectedCategories.includes(categoryName)
-      ? selectedCategories.filter(c => c !== categoryName)
-      : [...selectedCategories, categoryName];
+  const handleCategoryToggle = (categorId: number) => {
+    const newCategories = selectedCategories.includes(categorId)
+      ? selectedCategories.filter(c => c !== categorId)
+      : [...selectedCategories, categorId];
     onCategoriesChange(newCategories);
     setAllSelected(newCategories.length === categories.length);
   };
@@ -27,7 +27,7 @@ const Filters: React.FC<FiltersProps> = ({
       onCategoriesChange([]);
       setAllSelected(false);
     } else {
-      onCategoriesChange(categories.map(c => c.name));
+      onCategoriesChange(categories.map(c => c.category_id));
       setAllSelected(true);
     }
   };
@@ -49,8 +49,11 @@ const Filters: React.FC<FiltersProps> = ({
       
       <div className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Période</label>
-          <div className="grid grid-cols-2 gap-3">
+          <label className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded-full"></div>
+            Période
+          </label>
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-gray-500 mb-1 font-medium">Début</label>
               <input
@@ -76,14 +79,17 @@ const Filters: React.FC<FiltersProps> = ({
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Catégories</label>
-          <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+          <label className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full"></div>
+            Catégories
+          </label>
+          <div className="grid grid-cols-2 gap-3 max-h-52 overflow-y-auto p-2 bg-gray-50/50 rounded-xl">
             {categories.map(category => {
-              const isSelected = selectedCategories.includes(category.name);
+              const isSelected = selectedCategories.includes(category.category_id);
               return (
                 <button
                   key={category.category_id}
-                  onClick={() => handleCategoryToggle(category.name)}
+                  onClick={() => handleCategoryToggle(category.category_id)}
                   className={`p-2 rounded-lg flex items-center justify-center transition-all duration-200 text-sm font-medium ${
                     isSelected ? 'shadow-sm' : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:bg-gray-100'
                   }`}

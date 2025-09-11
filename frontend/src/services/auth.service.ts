@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../constants/api";
-import type { AuthResponse } from "../types";
+import type { AuthError, AuthResponse } from "../types";
+import { storageService } from "./storage.service";
 
 export const authService = {
   /**
@@ -57,53 +58,53 @@ export const authService = {
   /**
    * Récupère le profil de l'utilisateur connecté
    */
-  // getProfile: async (): Promise<AuthResponse> => {
-  //   const token = storageService.getToken();
+  getProfile: async (): Promise<AuthResponse> => {
+    const token = storageService.getToken();
     
-  //   if (!token) {
-  //     const error = new Error("Token d'authentification manquant") as AuthError;
-  //     error.status = 401;
-  //     throw error;
-  //   }
+    if (!token) {
+      const error = new Error("Token d'authentification manquant") as AuthError;
+      error.status = 401;
+      throw error;
+    }
 
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/auth/me`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${token}`
-  //       }
-  //     });
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-  //     if (response.status === 500) {
-  //       console.warn('Erreur 500 du serveur sur /auth/me - utilisation des données stockées');
-  //       const storedUser = storageService.getUser();
-  //       if (storedUser) {
-  //         return storedUser;
-  //       }
-  //       throw new Error('Erreur serveur et aucune donnée utilisateur stockée');
-  //     }
+      if (response.status === 500) {
+        console.warn('Erreur 500 du serveur sur /auth/me - utilisation des données stockées');
+        const storedUser = storageService.getUser();
+        if (storedUser) {
+          return storedUser;
+        }
+        throw new Error('Erreur serveur et aucune donnée utilisateur stockée');
+      }
 
-  //     const data = await response.json();
+      const data = await response.json();
       
-  //     if (!response.ok) {
-  //       if (response.status === 401) {
-  //         storageService.clearAuth();
-  //       }
-  //       throw new Error(data.message || `Erreur HTTP: ${response.status}`);
-  //     }
+      if (!response.ok) {
+        if (response.status === 401) {
+          storageService.clearAuth();
+        }
+        throw new Error(data.message || `Erreur HTTP: ${response.status}`);
+      }
 
-  //     return data;
-  //   } catch (error) {
-  //     console.error('Erreur lors de la récupération du profil:', error);
+      return data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du profil:', error);
       
-  //     const storedUser = storageService.getUser();
-  //     if (storedUser) {
-  //       console.warn('Utilisation des données utilisateur stockées comme fallback');
-  //       return storedUser;
-  //     }
+      const storedUser = storageService.getUser();
+      if (storedUser) {
+        console.warn('Utilisation des données utilisateur stockées comme fallback');
+        return storedUser;
+      }
       
-  //     throw new Error('Impossible de récupérer le profil utilisateur');
-  //   }
-  // }
+      throw new Error('Impossible de récupérer le profil utilisateur');
+    }
+  }
 };

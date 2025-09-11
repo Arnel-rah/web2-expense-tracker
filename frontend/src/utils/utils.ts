@@ -1,20 +1,23 @@
-export const getDefaultDateRange = () => {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1);
-  const end = new Date();
+// export const getDefaultDateRange = () => {
+//   const now = new Date();
+//   const start = new Date(now.getFullYear(), now.getMonth(), 1);
+//   const end = new Date();
+
+import type { Category } from "../types";
+
   
-  const formatLocalDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+//   const formatLocalDate = (date: Date) => {
+//     const year = date.getFullYear();
+//     const month = String(date.getMonth() + 1).padStart(2, '0');
+//     const day = String(date.getDate()).padStart(2, '0');
+//     return `${year}-${month}-${day}`;
+//   };
   
-  return {
-    start: formatLocalDate(start),
-    end: formatLocalDate(end)
-  };
-};
+//   return {
+//     start: formatLocalDate(start),
+//     end: formatLocalDate(end)
+//   };
+// };
 
 export const createDateRange = (startDate: string, endDate: string) => {
   const formatDateToMidnight = (dateString: string) => {
@@ -38,9 +41,32 @@ export const createDateRange = (startDate: string, endDate: string) => {
   return { start, end };
 };
 
+export const getDefaultDateRange = () => {
+  const now = new Date();
+  
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const localStartDate = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000));
+  const localEndDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+  
+  return {
+    start: localStartDate.toISOString().split('T')[0],
+    end: localEndDate.toISOString().split('T')[0]
+  };
+};
+
 export const isInDateRange = (date: string, start: Date, end: Date) => {
   const itemDate = new Date(date);
   return itemDate >= start && itemDate <= end;
+};
+
+// export const getCategoryNameById = (categoryId: number, categories: Category[]): string => {
+//   const category = categories.find(cat => cat.category_id === categoryId);
+//   return category?.name || `Catégorie ${categoryId}`;
+// };
+
+export const getCategoryName = (categoryId: number, categories: Category[]): string => {
+  const category = categories.find(cat => cat.category_id === categoryId);
+  return category?.name || 'Non catégorisé';
 };
 
 export const formatPeriod = (startDate: string, endDate: string) => {

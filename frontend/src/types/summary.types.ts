@@ -1,6 +1,8 @@
 export interface SummaryForm {
   total_income: number;
   total_expenses: number;
+  totalIncomes: number;
+  totalExpenses: number;
   balance: number;
 }
 
