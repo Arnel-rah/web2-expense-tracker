@@ -30,14 +30,15 @@ export default function IncomeForm ({ existingIncome = null, onSuccess }: Income
       source: '',
       description: ''
     },
-    '/incomes'
+    '/incomes',
+    onSuccess
   );
 
   useEffect(()=>{
     if(existingIncome){
       setFormData(existingIncome);
     }
-  },[existingIncome])
+  },[existingIncome, setFormData])
 
 
   const handleFormSubmit = async (e: React.FormEvent)=>{
