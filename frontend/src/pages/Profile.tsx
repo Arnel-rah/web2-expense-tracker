@@ -9,10 +9,10 @@ import {
   faShieldAlt, 
   faChartBar, 
   faMoneyBillWave,
-  faCheckCircle,
   faTimesCircle,
   faLightbulb
 } from "@fortawesome/free-solid-svg-icons";
+import toast from "react-hot-toast";
 
 interface UserProfile {
   email: string;
@@ -63,26 +63,16 @@ export default function Profile() {
       });
 
       setSuccess("Password changed successfully!");
+      toast.success(success)
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || "Feature not available. Please contact support.");
     } finally {
       setPasswordLoading(false);
     }
   };
-
-  // if (loading) {
-  //   return (
-  //     <>
-  //       <Header />
-  //       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-  //         <div className="text-lg">Loading profile...</div>
-  //       </div>
-  //     </>
-  //   );
-  // }
 
   return (
     <>
@@ -98,13 +88,6 @@ export default function Profile() {
             <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm mb-4">
               <FontAwesomeIcon icon={faTimesCircle} className="mr-2" />
               {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm mb-4">
-              <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
-              {success}
             </div>
           )}
 
