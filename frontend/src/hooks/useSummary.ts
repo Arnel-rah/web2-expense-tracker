@@ -3,6 +3,8 @@ import { summaryService } from "../services";
 import type { SummaryResponse } from "../types/summary.types";
 
 const DEFAULT_SUMMARY: SummaryResponse = {
+  totalExpenses: 0,
+  totalIncome: 0,
   total_income: 0,
   total_expenses: 0,
   balance: 0

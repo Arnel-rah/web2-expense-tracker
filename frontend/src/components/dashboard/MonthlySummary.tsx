@@ -58,7 +58,7 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
     }
     return max;
   }
-  
+
   const largestExpense = getMax(monthlySummary.expenses);
   
   const isOverBudget = true; // monthlySummary.summary?.totalExpenses > monthlySummary.summary?.totalIncome;

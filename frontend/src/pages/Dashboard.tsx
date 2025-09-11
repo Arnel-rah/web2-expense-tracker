@@ -58,13 +58,13 @@ export default function Dashboard() {
 
   const { summary, monthlySummary } = useSummary();
 
-  useEffect(() => {
-    console.log(getDefaultDateRange());
-  },[])
+  // useEffect(() => {
+  //   console.log(getDefaultDateRange());
+  // },[])
 
   useEffect(() => {
-    console.log("summary:", summary);
-    console.log("expenses:", expenses);
+    // console.log("summary:", summary);
+    // console.log("expenses:", expenses);
     // console.log("incomes:", incomes);
     // console.log("date:", startDate + "--->" + endDate);
     // console.log("selectedCategories:", selectedCategories);
