@@ -43,30 +43,32 @@ const Charts: React.FC<ChartsProps> = ({
      * Soit expense de type
      */
   }, [expenses, incomes, startDate, endDate, selectedCategories, categories])
+  console.log(startDate);
+
   const { periodIncomes, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     const periodIncomes = incomes
       .filter(income => {
-        const incomeDate = new Date(income.date);
+        const incomeDate = new Date(income.created_at);
         return incomeDate >= start && incomeDate <= end;
       })
-      .reduce((sum, income) => sum + income.amount, 0);
+      .reduce((sum, income) => sum + Number(income.amount), 0);
 
     const periodExpenses = expenses
       .filter(expense => {
-        const expenseDate = new Date(expense.date);
+        const expenseDate = new Date(expense.created_at);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
         const matchesCategory = selectedCategories.length === 0 ||
           (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
-      .reduce((sum, expense) => sum + expense.amount, 0);
-
-    const categoryData = expenses
+      .reduce((sum, expense) => sum + Number(expense.amount), 0);
+    
+      const categoryData = expenses
       .filter(expense => {
-        const expenseDate = new Date(expense.date);
+        const expenseDate = new Date(expense.created_at);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
         const matchesCategory = selectedCategories.length === 0 ||
           (expense.category_id && selectedCategories.includes(expense.category_id));
@@ -74,10 +76,14 @@ const Charts: React.FC<ChartsProps> = ({
       })
       .reduce((acc, expense) => {
         if (expense.category_id) {
-          acc[expense.category_id] = (acc[expense.category_id] || 0) + expense.amount;
+          const category = categories.find(cat => cat.category_id === expense.category_id);
+          const categoryName = category?.name || `Catégorie ${expense.category_id}`;
+          acc[categoryName] = (acc[categoryName] || 0) + Number(expense.amount);
         }
         return acc;
       }, {} as Record<string, number>);
+
+    console.log("CATEGORY - DATA", categoryData);
 
     const getLastSixMonths = () => {
       const months = [];
@@ -97,7 +103,7 @@ const Charts: React.FC<ChartsProps> = ({
       categoryData,
       lastSixMonths: getLastSixMonths()
     };
-  }, [expenses, incomes, startDate, endDate, selectedCategories]);
+  }, [expenses, incomes, startDate, endDate, selectedCategories, categories]);
 
   const categoryColors = useMemo(() => [
     '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
@@ -108,11 +114,11 @@ const Charts: React.FC<ChartsProps> = ({
 
   const doughnutData = useMemo(() => {
     const labels = Object.keys(categoryData);
-    
+
     return {
       labels,
       datasets: [{
-        data: Object.values(categoryData),
+        data: Object.values(categoryData).map(val => Number(val)),
         backgroundColor: labels.map((_, index) => categoryColors[index % categoryColors.length]),
         hoverBackgroundColor: labels.map((_, index) => categoryColors[index % categoryColors.length]),
         borderWidth: 3,
@@ -147,8 +153,8 @@ const Charts: React.FC<ChartsProps> = ({
   const barData = useMemo(() => {
     const calculateMonthlyData = (month: string, data: Expense[] | Income[]) => {
       return data.filter(item => {
-        return item.date && item.date.startsWith(month);
-      }).reduce((sum, item) => sum + item.amount, 0);
+        return item.created_at && item.created_at.startsWith(month);
+      }).reduce((sum, item) => sum + Number(item.amount), 0);
     };
 
     return {
@@ -204,15 +210,15 @@ const Charts: React.FC<ChartsProps> = ({
     },
   }), []);
 
-  const getCategoryColor = (categoryName: string) => {
-    const index = Object.keys(categoryData).indexOf(categoryName);
+  const getCategoryColor = (categoryId: string) => {
+    const index = Object.keys(categoryData).indexOf(categoryId);
     return index !== -1 ? categoryColors[index % categoryColors.length] : '#CCCCCC';
   };
 
   const hasExpenseData = Object.keys(categoryData).length > 0;
   const hasBarData = lastSixMonths.some(month =>
-    expenses.some(expense => expense.date && expense.date.startsWith(month)) ||
-    incomes.some(income => income.date && income.date.startsWith(month))
+    expenses.some(expense => expense.created_at && expense.created_at.startsWith(month)) ||
+    incomes.some(income => income.created_at && income.created_at.startsWith(month))
   );
 
   return (
@@ -255,14 +261,16 @@ const Charts: React.FC<ChartsProps> = ({
               </h4>
               <ul className="space-y-3 max-h-44 overflow-y-auto">
                 {Object.entries(categoryData)
-                  .sort(([, a], [, b]) => b - a)
-                  .map(([category, amount]) => (
-                    <li key={category} className="flex justify-between items-center text-sm bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  .sort(([, a], [, b]) => Number(b) - Number(a))
+                  .map(([categoryName, amount]) => (
+                    <li key={categoryName} className="flex justify-between items-center text-sm bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
                       <div className="flex items-center">
-                        <div className="w-4 h-4 rounded-full mr-3 shadow-sm" style={{ backgroundColor: getCategoryColor(category) }} />
-                        <span className="text-gray-700 font-medium">{category}</span>
+                        <div className="w-4 h-4 rounded-full mr-3 shadow-sm" style={{ backgroundColor: getCategoryColor(categoryName) }} />
+                        <span className="text-gray-700 font-medium">{categoryName}</span>
                       </div>
-                      <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-lg">Ar {amount}</span>
+                      <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-lg">
+                        {Number(amount).toLocaleString('fr-FR')} Ar
+                      </span>
                     </li>
                   ))}
               </ul>

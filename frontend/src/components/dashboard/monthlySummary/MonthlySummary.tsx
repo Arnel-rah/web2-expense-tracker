@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { MonthlySummaryProps } from '../../../types/MonthlySummary.types.ts';
 
 import { FinancialCard } from './FinancialCard.tsx';
@@ -14,17 +14,6 @@ const LOADING_DELAY = 2000;
 const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
-
-  // useEffect(() => {
-  //   console.log("summary:", monthlySummary.summary);
-  //   console.log("summary-Expense:", monthlySummary.summary.totalExpenses);
-  //   console.log("summary-Incomes:", monthlySummary.summary.totalIncomes);
-  //   console.log("summary-balance:", monthlySummary.summary.balance);
-  //   console.log("expenses:", monthlySummary.expenses);
-  //   console.log("incomes:", monthlySummary.incomes);
-  //   console.log("date:", monthlySummary.startDate + "--->" + monthlySummary.endDate);
-  //   console.log("selectedCategories:", monthlySummary.selectedCategories);
-  // }, [monthlySummary]);
 
   const handleReload = async () => {
     setIsLoading(true);
