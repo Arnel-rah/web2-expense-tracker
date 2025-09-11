@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
+import { Loader } from "../components/ui/Loader";
 import { apiFetch } from "../api/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
@@ -9,10 +10,9 @@ import {
   faShieldAlt, 
   faChartBar, 
   faMoneyBillWave,
-  faCheckCircle,
-  faTimesCircle,
   faLightbulb
 } from "@fortawesome/free-solid-svg-icons";
+import toast from "react-hot-toast";
 
 interface UserProfile {
   email: string;
@@ -25,35 +25,29 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let email = "";
-    if (!email) {
-      const storedUserData = localStorage.getItem("user_data");
-      if (storedUserData) {
-        const parsedData = JSON.parse(storedUserData);
-        email = parsedData.email;
-      }
+    const storedUserData = localStorage.getItem("user_data");
+    if (storedUserData) {
+      const parsedData = JSON.parse(storedUserData);
+      email = parsedData.email || "";
     }
-    if (!email) email = "";
 
     setUserProfile({ email });
+    setLoading(false);
   }, []);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordLoading(true);
-    setError("");
-    setSuccess("");
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords do not match");
       setPasswordLoading(false);
       return;
     }
-
 
     try {
       await apiFetch("/auth/change-password", {
@@ -62,27 +56,27 @@ export default function Profile() {
         body: JSON.stringify({ currentPassword, newPassword }),
       });
 
-      setSuccess("Password changed successfully!");
+      toast.success("Password changed successfully!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setError(err.message || "Feature not available. Please contact support.");
+      toast.error(err.message || "Feature not available. Please contact support.");
     } finally {
       setPasswordLoading(false);
     }
   };
 
-  // if (loading) {
-  //   return (
-  //     <>
-  //       <Header />
-  //       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-  //         <div className="text-lg">Loading profile...</div>
-  //       </div>
-  //     </>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <Loader />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -93,20 +87,6 @@ export default function Profile() {
             <FontAwesomeIcon icon={faUser} className="mr-2" />
             User Profile
           </h1>
-
-          {error && (
-            <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm mb-4">
-              <FontAwesomeIcon icon={faTimesCircle} className="mr-2" />
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm mb-4">
-              <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
-              {success}
-            </div>
-          )}
 
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -226,4 +206,4 @@ export default function Profile() {
       </div>
     </>
   );
-}
+} 

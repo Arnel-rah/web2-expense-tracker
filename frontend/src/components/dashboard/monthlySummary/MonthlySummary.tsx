@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import type { MonthlySummaryProps } from '../../../types/MonthlySummary.types.ts';
+import type { MonthlySummaryProps, Expense} from '../../../types';
 
-import { FinancialCard } from './FinancialCard.tsx';
 import { Header } from './Header.tsx';
+import { FinancialCard } from './FinancialCard.tsx';
 import { ExpenseRateBar } from './ExpenseRateBar.tsx';
 import { LargestExpenseCard } from './LargestExpenseCard.tsx';
 import { BudgetAlert } from './BudgetAlert.tsx';
 import { NoDataState } from './NoDataState.tsx';
-import type { Expense } from '../../../types/expenses.types.ts';
 
 const LOADING_DELAY = 2000;
 

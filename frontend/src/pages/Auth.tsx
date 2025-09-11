@@ -1,50 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/ui/Button";
 import { useAuth } from "../hooks/useAuth";
 import type { AuthFormData, AuthProps } from "../types";
+import toast from "react-hot-toast";
+import { Loader } from "../components/ui/Loader";
 
 const Auth: React.FC<AuthProps> = ({ mode }) => {
-  const formValue = {
+  const isSignupMode = mode === "signup";
+  const initialFormData = {
     email: mode === "login" ? "user@gmail.com" : "",
     password: mode === "login" ? "12345678" : "",
     confirmPassword: "",
   };
-  const [formData, setFormData] = useState<AuthFormData>(formValue);
-  const [formError, setFormError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login, signup, loading: authLoading, error: authError } = useAuth();
+  const [formData, setFormData] = useState<AuthFormData>(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentField, setCurrentField] = useState<string>("email");
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const { login, signup, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isLoading = isSubmitting || authLoading;
 
   useEffect(() => {
-    setFormData(formValue);
-    setFormError("");
+    setFormData(initialFormData);
+    setCurrentField("email");
   }, [mode]);
 
-  const validateForm = () => {
-    if (!formData.email || !formData.password) {
-      setFormError("Please fill in all fields");
+  useEffect(() => {
+    if (currentField) {
+      document.getElementById(currentField)?.focus();
+    }
+  }, [currentField]);
+
+  const validateForm = useCallback(() => {
+    const { email, password, confirmPassword } = formData;
+
+    if (!email) {
+      toast.error("Please enter your email");
+      setCurrentField("email");
       return false;
     }
 
-    if (mode === "signup") {
-      if (formData.password !== formData.confirmPassword) {
-        setFormError("Passwords don't match");
+    if (!password) {
+      toast.error("Please enter your password");
+      setCurrentField("password");
+      return false;
+    }
+
+    if (isSignupMode) {
+      if (!confirmPassword) {
+        toast.error("Please confirm your password");
+        setCurrentField("confirmPassword");
         return false;
       }
-      if (formData.password.length < 6) {
-        setFormError("Password must be at least 6 characters long");
+      if (password !== confirmPassword) {
+        toast.error("Passwords don't match");
+        setCurrentField("confirmPassword");
+        return false;
+      }
+      if (password.length < 6) {
+        toast.error("Password must be at least 6 characters long");
+        setCurrentField("password");
         return false;
       }
     }
 
     return true;
-  };
+  }, [formData, isSignupMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError("");
     setIsSubmitting(true);
 
     if (!validateForm()) {
@@ -53,122 +80,117 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
     }
 
     try {
-      console.log("Tentative de connexion avec:", formData.email);
-      const result =
-        mode === "login"
-          ? await login(formData.email, formData.password)
-          : await signup(formData.email, formData.password);
-
-      console.log("Réponse reçue:", result);
+      const authFunction = isSignupMode ? signup : login;
+      const result = await authFunction(formData.email, formData.password);
 
       if (result.token) {
-        console.log("Token reçu, navigation vers dashboard");
-        navigate("/dashboard");
+        const successMessage = isSignupMode ? "Account created successfully!" : "Login successful!";
+        toast.success(successMessage);
+        
+        setIsNavigating(true);
+        
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
       }
-    } catch (error) {
-      console.error("Erreur complète:", error);
+    } catch (error: any) {
+      const message = error.message?.toLowerCase() || "";
+      let errorMessage = "An error occurred. Please try again.";
+
+      if (message.includes("already exist") || message.includes("email")) {
+        errorMessage = "Email already exists";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange =
-    (field: keyof typeof formData) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+  const handleInputChange = (field: keyof AuthFormData) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData(prev => ({ ...prev, [field]: e.target.value }));
     };
+  };
 
-  const isSignupMode = mode === "signup";
-  const error = formError || authError;
-  const isLoading = isSubmitting || authLoading;
+  const formFields = [
+    {
+      id: "email",
+      label: "Email address",
+      type: "email",
+      value: formData.email,
+      placeholder: "Enter your email"
+    },
+    {
+      id: "password",
+      label: "Password",
+      type: "password",
+      value: formData.password,
+      placeholder: "Enter your password"
+    },
+    ...(isSignupMode ? [{
+      id: "confirmPassword",
+      label: "Confirm Password",
+      type: "password",
+      value: formData.confirmPassword,
+      placeholder: "Confirm your password",
+      hasError: formData.confirmPassword && formData.confirmPassword !== formData.password
+    }] : [])
+  ];
+
+  const buttonText = isSignupMode ? "Sign up" : "Login";
+  const linkText = isSignupMode ? "Login" : "Sign up";
+  const linkPath = isSignupMode ? "/login" : "/signup";
+  const accountMessage = isSignupMode ? "Already have an account? " : "Don't have an account? ";
+  const titleMessage = isSignupMode ? "Create a new account" : "Continue with your account";
+
+  if (isNavigating) {
+    return <Loader />;
+  }
 
   return (
     <div className="min-h-screen flex flex-row-reverse items-center justify-around px-6 lg:px-20 bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      
       <div className="max-w-md w-full space-y-8 p-8 rounded-2xl shadow-xl bg-white/80 backdrop-blur-sm border border-gray-200">
+        
         <div className="space-y-3 flex flex-col items-center">
           <h2 className="text-center text-4xl font-extrabold text-gray-900 tracking-tight">
             Expense Tracker
           </h2>
           <p className="text-gray-500 text-sm">
-            {isSignupMode
-              ? "Create a new account"
-              : "Continue with your account"}
+            {titleMessage}
           </p>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md text-sm text-center">
-            {error}
-          </div>
-        )}
-
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+          
           <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Email address
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange("email")}
-                disabled={isLoading}
-                className="w-full px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-md
-                 text-gray-900 placeholder-gray-400
-                 border border-transparent shadow-md
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                 transition-all duration-300 disabled:opacity-50"
-                placeholder="Enter your email"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange("password")}
-                disabled={isLoading}
-                className="w-full px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-md
-                 text-gray-900 placeholder-gray-400
-                 border border-transparent shadow-md
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                 transition-all duration-300 disabled:opacity-50"
-                placeholder="Enter your password"
-              />
-            </div>
-            {isSignupMode && (
-              <div>
+            {formFields.map((field) => (
+              <div key={field.id}>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Confirm Password
+                  {field.label}
                 </label>
                 <input
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange("confirmPassword")}
+                  id={field.id}
+                  type={field.type}
+                  value={field.value}
+                  onChange={handleInputChange(field.id as keyof AuthFormData)}
                   disabled={isLoading}
                   className={`w-full px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-md
                     text-gray-900 placeholder-gray-400
                     border border-transparent shadow-md
-                    focus:outline-none focus:ring-2
-                    ${
-                      formData.confirmPassword &&
-                      formData.confirmPassword !== formData.password
-                        ? "focus:ring-red-500 focus:border-red-500"
-                        : "focus:ring-green-500 focus:border-green-500"
-                    }
-                    transition-all duration-300 disabled:opacity-50`}
-                  placeholder="Confirm your password"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                    transition-all duration-300 disabled:opacity-50
+                    ${field.hasError ? "focus:ring-red-500 focus:border-red-500" : ""}`}
+                  placeholder={field.placeholder}
                 />
-                {formData.confirmPassword &&
-                  formData.confirmPassword !== formData.password && (
-                    <p className="mt-1 text-xs text-red-500">
-                      Passwords do not match
-                    </p>
-                  )}
+                {field.hasError && (
+                  <p className="mt-1 text-xs text-red-500">Passwords do not match</p>
+                )}
               </div>
-            )}
+            ))}
           </div>
 
           <Button
@@ -177,25 +199,24 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
             disabled={isLoading}
             className="w-full rounded-xl py-3 font-semibold shadow-md hover:shadow-lg transition-all duration-300"
           >
-            {isSignupMode ? "Sign up" : "Login"}
+            {buttonText}
           </Button>
 
           <p className="mt-3 text-center text-sm text-gray-600">
-            {isSignupMode
-              ? "Already have an account? "
-              : "Don't have an account? "}
+            {accountMessage}
             <Link
-              to={isSignupMode ? "/login" : "/signup"}
+              to={linkPath}
               className="font-semibold text-blue-600 hover:text-blue-500 transition-colors"
               onClick={(e) => isLoading && e.preventDefault()}
             >
-              {isSignupMode ? "Login" : "Sign up"}
+              {linkText}
             </Link>
           </p>
+        
         </form>
+      
       </div>
 
-      {/* Logo */}
       <div className="hidden md:flex flex-col items-center space-y-4">
         <img
           src="./expense-logo.png"
@@ -203,10 +224,10 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
           className="w-72 h-72 object-contain drop-shadow-md"
         />
         <p className="text-gray-600 text-center max-w-xs text-sm">
-          Manage your expenses with ease and keep track of your finances
-          anywhere.
+          Manage your expenses with ease and keep track of your finances anywhere.
         </p>
       </div>
+    
     </div>
   );
 };
