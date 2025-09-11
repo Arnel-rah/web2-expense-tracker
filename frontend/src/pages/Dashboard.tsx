@@ -4,7 +4,7 @@ import Charts from '../components/dashboard/Charts/Charts';
 import Filters from '../components/dashboard/Filters/Filters';
 import type { FiltersProps } from '../types/MonthlySummary.types';
 import { useApiData } from '../hooks/useApiData';
-import MonthlySummary from '../components/dashboard/MonthlySummary/MonthlySummary';
+import MonthlySummary from '../components/dashboard/MonthlySummary';
 import { useSummary } from '../hooks/useSummary';
 import { useDataProps } from '../utils/dataPropsHandler';
 import { getDefaultDateRange } from '../utils/utils';
