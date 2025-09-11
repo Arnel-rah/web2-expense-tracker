@@ -198,36 +198,53 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
   );
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
-      <div className='flex items-center gap-2 mb-6'>
-        <FontAwesomeIcon icon={faChartLine} className="text-gray-700" />
-        <h2 className="text-2xl font-bold text-gray-900">Visualisations</h2>
+    <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-white/20 hover:shadow-3xl transition-all duration-300">
+      <div className='flex items-center gap-3 mb-8'>
+        <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+          <FontAwesomeIcon icon={faChartLine} className="text-white text-lg" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            Visualisations
+          </h2>
+          <p className="text-gray-600 text-sm">Analyse graphique de vos données financières</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Répartition des Dépenses</h3>
-          <div className="h-80">
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 mb-4">
+            <h3 className="text-xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2">
+              <span className="text-2xl">🥧</span>
+              Répartition des Dépenses
+            </h3>
+            <p className="text-sm text-gray-600 text-center">Visualisation par catégories</p>
+          </div>
+          <div className="h-80 bg-white rounded-xl p-4 shadow-inner">
             {hasExpenseData ? <Doughnut data={doughnutData} options={doughnutOptions} /> : 
-              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-center">Aucune donnée de dépenses pour cette période</p>
+              <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl">
+                <div className="text-6xl mb-4">📊</div>
+                <p className="text-gray-500 text-center font-medium">Aucune donnée de dépenses pour cette période</p>
               </div>
             }
           </div>
 
           {hasExpenseData && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Détails par catégorie</h4>
-              <ul className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="mt-6 p-5 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+              <h4 className="font-bold mb-4 text-gray-800 border-b border-gray-300 pb-3 flex items-center gap-2">
+                <span className="text-lg">📋</span>
+                Détails par catégorie
+              </h4>
+              <ul className="space-y-3 max-h-44 overflow-y-auto">
                 {Object.entries(categoryData)
                   .sort(([, a], [, b]) => b - a)
                   .map(([category, amount]) => (
-                    <li key={category} className="flex justify-between items-center text-sm">
+                    <li key={category} className="flex justify-between items-center text-sm bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
                       <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: getCategoryColor(category) }} />
-                        <span className="text-gray-600">{category}</span>
+                        <div className="w-4 h-4 rounded-full mr-3 shadow-sm" style={{ backgroundColor: getCategoryColor(category) }} />
+                        <span className="text-gray-700 font-medium">{category}</span>
                       </div>
-                      <span className="font-medium text-gray-900">Ar {amount}</span>
+                      <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-lg">Ar {amount}</span>
                     </li>
                   ))}
               </ul>
@@ -236,29 +253,50 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Historique des Finances</h3>
-          <div className="h-80">
+          <div className="bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl p-4 mb-4">
+            <h3 className="text-xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2">
+              <span className="text-2xl">📈</span>
+              Historique des Finances
+            </h3>
+            <p className="text-sm text-gray-600 text-center">Évolution sur 6 mois</p>
+          </div>
+          <div className="h-80 bg-white rounded-xl p-4 shadow-inner">
             {hasBarData ? <Bar data={barData} options={barOptions} /> : 
-              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-center">Aucune donnée disponible pour l'historique</p>
+              <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl">
+                <div className="text-6xl mb-4">📈</div>
+                <p className="text-gray-500 text-center font-medium">Aucune donnée disponible pour l'historique</p>
               </div>
             }
           </div>
 
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Statistiques de la Période</h4>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="bg-green-100 p-3 rounded">
-                <div className="text-green-800 font-semibold">Revenus</div>
-                <div className="text-green-900 font-bold text-lg">Ar {periodIncome}</div>
+          <div className="mt-6 p-5 bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl border border-gray-200">
+            <h4 className="font-bold mb-4 text-gray-800 border-b border-gray-300 pb-3 flex items-center gap-2">
+              <span className="text-lg">📊</span>
+              Statistiques de la Période
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-gradient-to-br from-emerald-100 to-green-200 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className="text-green-800 font-bold flex items-center gap-1">
+                  <span className="text-lg">💰</span>
+                  Revenus
+                </div>
+                <div className="text-green-900 font-extrabold text-xl mt-1">Ar {periodIncome.toLocaleString('fr-FR')}</div>
               </div>
-              <div className="bg-red-100 p-3 rounded">
-                <div className="text-red-800 font-semibold">Dépenses</div>
-                <div className="text-red-900 font-bold text-lg">Ar {periodExpenses}</div>
+              <div className="bg-gradient-to-br from-red-100 to-rose-200 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className="text-red-800 font-bold flex items-center gap-1">
+                  <span className="text-lg">💸</span>
+                  Dépenses
+                </div>
+                <div className="text-red-900 font-extrabold text-xl mt-1">Ar {periodExpenses.toLocaleString('fr-FR')}</div>
               </div>
-              <div className={`${periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'} p-3 rounded col-span-2`}>
-                <div className={`${periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'} font-semibold`}>Solde Final</div>
-                <div className={`${periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} font-bold text-lg`}>Ar {periodBalance}</div>
+              <div className={`${periodBalance >= 0 ? 'bg-gradient-to-br from-blue-100 to-indigo-200' : 'bg-gradient-to-br from-orange-100 to-amber-200'} p-4 rounded-xl col-span-2 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+                <div className={`${periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'} font-bold flex items-center gap-1`}>
+                  <span className="text-lg">{periodBalance >= 0 ? '📈' : '📉'}</span>
+                  Solde Final
+                </div>
+                <div className={`${periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} font-extrabold text-2xl mt-1`}>
+                  Ar {periodBalance.toLocaleString('fr-FR')}
+                </div>
               </div>
             </div>
           </div>

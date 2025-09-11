@@ -48,7 +48,7 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
 
   const savingsRate = 0; // monthlySummary.summary?.balance * 100 / monthlySummary.summary?.totalIncome;
   const expenseRate = 0; // monthlySummary.summary?.totalExpenses * 100 / monthlySummary.summary?.totalIncome;
-  
+
   const getMax = (expense: Expense[]) => {
     let max = expense[0];
 
@@ -59,9 +59,9 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
     }
     return max;
   }
-  
+
   const largestExpense = getMax(monthlySummary.expenses);
-  
+
   const isOverBudget = true; // monthlySummary.summary?.totalExpenses > monthlySummary.summary?.totalIncome;
   const overBudgetAmount = 0; // monthlySummary.summary?.totalExpenses - monthlySummary.summary?.totalIncome;
 
@@ -73,6 +73,7 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
         endDate={monthlySummary.endDate}
         hasData={hasData}
         isLoading={isLoading}
+        onReload={handleReload}
       />
 
       {!hasData ? (
@@ -111,19 +112,19 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <ExpenseRateBar expenseRate={expenseRate} />
-        {largestExpense && <LargestExpenseCard largestExpense={largestExpense} />}
-      </div>
+            <ExpenseRateBar expenseRate={expenseRate} />
+            {largestExpense && <LargestExpenseCard largestExpense={largestExpense} />}
+          </div>
 
-      {(isOverBudget || expenseRate > 84) && (
-        <BudgetAlert
-          isOverBudget={isOverBudget}
-          expenseRate={expenseRate}
-          overBudgetAmount={overBudgetAmount}
-          totalIncome={Number(monthlySummary.summary?.totalIncome)}
-          totalExpenses={Number(monthlySummary.summary?.totalExpenses)}
-        />
-      )}
+          {(isOverBudget || expenseRate > 84) && (
+            <BudgetAlert
+              isOverBudget={isOverBudget}
+              expenseRate={expenseRate}
+              overBudgetAmount={overBudgetAmount}
+              totalIncome={Number(monthlySummary.summary?.totalIncome)}
+              totalExpenses={Number(monthlySummary.summary?.totalExpenses)}
+            />
+          )}
         </>
       )}
     </div >

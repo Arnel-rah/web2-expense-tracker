@@ -80,7 +80,7 @@ export const authService = {
         console.warn('Erreur 500 du serveur sur /auth/me - utilisation des données stockées');
         const storedUser = storageService.getUser();
         if (storedUser) {
-          return storedUser;
+          return { user: storedUser };
         }
         throw new Error('Erreur serveur et aucune donnée utilisateur stockée');
       }
@@ -101,7 +101,7 @@ export const authService = {
       const storedUser = storageService.getUser();
       if (storedUser) {
         console.warn('Utilisation des données utilisateur stockées comme fallback');
-        return storedUser;
+        return { user: storedUser };
       }
       
       throw new Error('Impossible de récupérer le profil utilisateur');

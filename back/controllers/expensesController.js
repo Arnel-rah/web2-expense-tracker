@@ -5,7 +5,13 @@ export const getExpenses = async (req, res) => {
   const { start, end, category, type } = req.query;
   const userId = req.userId;
 
-  let query = 'SELECT * FROM depense WHERE user_id = $1';
+  let query = `SELECT 
+  depense.*,
+  categorie.name AS category_name
+  FROM depense
+  INNER JOIN categorie ON depense.category_id = categorie.category_id
+  WHERE depense.user_id = $1;
+`
   const values = [userId];
 
   if (start) {
@@ -27,7 +33,13 @@ export const getExpenses = async (req, res) => {
 
   try {
     const result = await pool.query(query, values);
-    res.json(result.rows);
+
+    const formatted = result.rows.map(row => ({
+      ...row,
+      date: row.date ? row.date.toISOString().split("T")[0] : null
+    }));
+
+    res.json(formatted);
   } catch (error) {
     res.status(500).json({ message: 'Error getting expenses', error: error.message });
   }
