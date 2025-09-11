@@ -26,7 +26,6 @@ export default function Expense() {
 
   const handleFormSuccess = () => {
     setEditingExpense(null); 
-    refetch(); 
   };
 
   return (
