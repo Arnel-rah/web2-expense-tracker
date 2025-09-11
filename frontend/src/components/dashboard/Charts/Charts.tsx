@@ -300,11 +300,11 @@ const Charts: React.FC<ChartsProps> = ({
               </div>
               <div className="bg-red-100 p-3 rounded">
                 <div className="text-red-800 font-semibold">Dépenses</div>
-                <div className="text-red-900 font-bold text-lg">Ar {periodExpenses}</div>
+                <div className="text-red-900 font-bold text-lg">Ar {periodExpenses.toFixed(2)}</div>
               </div>
               <div className={`${periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'} p-3 rounded col-span-2`}>
                 <div className={`${periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'} font-semibold`}>Solde Final</div>
-                <div className={`${periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} font-bold text-lg`}>Ar {periodBalance}</div>
+                <div className={`${periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} font-bold text-lg`}>Ar {periodBalance.toFixed(2)}</div>
               </div>
             </div>
           </div>
