@@ -6,11 +6,8 @@ import type { FiltersProps } from '../types/MonthlySummary.types';
 import { useApiData } from '../hooks/useApiData';
 import MonthlySummary from '../components/dashboard/MonthlySummary/MonthlySummary';
 import { useSummary } from '../hooks/useSummary';
-
-const getDefaultDateRange = () => ({
-  start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-  end: new Date().toISOString().split('T')[0]
-});
+import { useDataProps } from '../utils/dataPropsHandler';
+import { getDefaultDateRange } from '../utils/utils';
 
 const DashboardHeader = ({
   onToggleFilter
@@ -56,10 +53,12 @@ export default function Dashboard() {
   const defaultDates = getDefaultDateRange();
   const [startDate, setStartDate] = useState(defaultDates.start);
   const [endDate, setEndDate] = useState(defaultDates.end);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Number[]>([]);
   const { expenses, incomes, categories } = useApiData();
 
-  const { summary, monthlySummary } = useSummary();
+  const { summary, monthlySummary, loading, error } = useSummary();
+
+  //  select depense.category_id, categorie.name,sum(amount) from depense Join categorie on categorie.category_id = depense.category_id group by depense.category_id, categorie.name;
 
   // useEffect(() => {
   //   console.log("summary:", summary);
@@ -71,7 +70,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (categories.length > 0) {
-      setSelectedCategories(categories.map(cat => cat.name));
+      setSelectedCategories(categories.map(cat => cat.category_id));
     }
   }, [categories]);
 
@@ -90,7 +89,7 @@ export default function Dashboard() {
     categories: categoriesWithColor
   };
 
-  const dataProps = {
+  const dataProps = useDataProps({
     summary: monthlySummary,
     expenses,
     incomes,
@@ -98,7 +97,12 @@ export default function Dashboard() {
     endDate,
     selectedCategories,
     categories: categoriesWithColor
-  };
+  });
+
+  // useEffect(() => {
+  //   console.log("DataProps object:", dataProps);
+  // }, [dataProps]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -117,11 +121,11 @@ export default function Dashboard() {
           />
 
           <div className="lg:col-span-3">
-            <MonthlySummary {...dataProps} />
+            <MonthlySummary {...dataProps} /> {/* Non verifier */}
           </div>
         </div>
 
-        <Charts {...dataProps} />
+        <Charts {...dataProps} /> {/* Non verifier */}
       </main>
     </div>
   );

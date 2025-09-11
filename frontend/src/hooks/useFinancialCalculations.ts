@@ -8,37 +8,13 @@ export const useFinancialCalculations = (
   incomes: Income[],
   startDate: string,
   endDate: string,
-  selectedCategories: string[]
+  selectedCategories: Number[]
 ): FinancialCalculations => {
   return useMemo(() => {
-    console.log('Calculating financial data...', {
-      expensesCount: expenses.length,
-      incomesCount: incomes.length,
-      startDate,
-      endDate,
-      selectedCategoriesCount: selectedCategories.length
-    });
 
-    const dateRange = createDateRange(startDate, endDate);
-    if (!dateRange) {
-      console.error('Invalid date range provided');
-      return {
-        filteredIncomes: [],
-        filteredExpenses: [],
-        totalIncome: 0,
-        totalExpenses: 0,
-        balance: 0,
-        savingsRate: 0,
-        expenseRate: 0,
-        largestExpense: null,
-        isOverBudget: false,
-        overBudgetAmount: 0
-      };
-    }
+    const { start, end } = createDateRange(startDate, endDate);
 
-    const { start, end } = dateRange;
-
-    const filteredIncomes = incomes.filter(income => 
+    const filteredIncomes = incomes.filter(income =>
       isInDateRange(income.date, start, end)
     );
 
