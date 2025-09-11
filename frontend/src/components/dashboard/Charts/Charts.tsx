@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -21,46 +21,69 @@ interface ChartsProps {
   incomes: Income[];
   startDate: string;
   endDate: string;
-  selectedCategories: string[];
+  selectedCategories: Number[];
   categories: Category[];
 }
 
-const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, selectedCategories, categories }) => {
-  const { periodIncome, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
+const Charts: React.FC<ChartsProps> = ({
+  expenses,
+  incomes,
+  startDate,
+  endDate,
+  selectedCategories,
+  categories
+}) => {
+  useEffect(() => {
+    console.log(expenses);
+    console.log(incomes);
+    console.log(startDate, endDate);
+    console.log(selectedCategories);
+    console.log(categories);
+    /**
+     * Soit expense de type
+     */
+  }, [expenses, incomes, startDate, endDate, selectedCategories, categories])
+  console.log(startDate);
+
+  const { periodIncomes, periodExpenses, periodBalance, categoryData, lastSixMonths } = useMemo(() => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    const periodIncome = incomes
+    const periodIncomes = incomes
       .filter(income => {
-        const incomeDate = new Date(income.date);
+        const incomeDate = new Date(income.created_at);
         return incomeDate >= start && incomeDate <= end;
       })
-      .reduce((sum, income) => sum + income.amount, 0);
+      .reduce((sum, income) => sum + Number(income.amount), 0);
 
     const periodExpenses = expenses
       .filter(expense => {
-        const expenseDate = new Date(expense.date);
+        const expenseDate = new Date(expense.created_at);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
-        const matchesCategory = selectedCategories.length === 0 || 
+        const matchesCategory = selectedCategories.length === 0 ||
           (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
-      .reduce((sum, expense) => sum + expense.amount, 0);
-
-    const categoryData = expenses
+      .reduce((sum, expense) => sum + Number(expense.amount), 0);
+    
+      const categoryData = expenses
       .filter(expense => {
-        const expenseDate = new Date(expense.date);
+        const expenseDate = new Date(expense.created_at);
         const matchesPeriod = expenseDate >= start && expenseDate <= end;
-        const matchesCategory = selectedCategories.length === 0 || 
+        const matchesCategory = selectedCategories.length === 0 ||
           (expense.category_id && selectedCategories.includes(expense.category_id));
         return matchesPeriod && matchesCategory;
       })
       .reduce((acc, expense) => {
         if (expense.category_id) {
-          acc[expense.category_id] = (acc[expense.category_id] || 0) + expense.amount;
+          const category = categories.find(cat => cat.category_id === expense.category_id);
+          const categoryName = category?.name || `Catégorie ${expense.category_id}`;
+          acc[categoryName] = (acc[categoryName] || 0) + Number(expense.amount);
         }
         return acc;
       }, {} as Record<string, number>);
+
+    console.log("CATEGORY - DATA", categoryData);
 
     const getLastSixMonths = () => {
       const months = [];
@@ -74,16 +97,16 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
     };
 
     return {
-      periodIncome,
+      periodIncomes,
       periodExpenses,
-      periodBalance: periodIncome - periodExpenses,
+      periodBalance: periodIncomes - periodExpenses,
       categoryData,
       lastSixMonths: getLastSixMonths()
     };
-  }, [expenses, incomes, startDate, endDate, selectedCategories]);
+  }, [expenses, incomes, startDate, endDate, selectedCategories, categories]);
 
   const categoryColors = useMemo(() => [
-    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', 
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
     '#FF6384', '#C9CBCF', '#7CFC00', '#20B2AA', '#FF00FF', '#00FFFF',
     '#FFD700', '#ADFF2F', '#FF4500', '#DA70D6', '#00BFFF', '#FF6347',
     '#40E0D0', '#EE82EE', '#F5DEB3', '#00FA9A', '#FF69B4', '#BA55D3'
@@ -91,10 +114,11 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
 
   const doughnutData = useMemo(() => {
     const labels = Object.keys(categoryData);
+
     return {
       labels,
       datasets: [{
-        data: Object.values(categoryData),
+        data: Object.values(categoryData).map(val => Number(val)),
         backgroundColor: labels.map((_, index) => categoryColors[index % categoryColors.length]),
         hoverBackgroundColor: labels.map((_, index) => categoryColors[index % categoryColors.length]),
         borderWidth: 3,
@@ -129,9 +153,8 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
   const barData = useMemo(() => {
     const calculateMonthlyData = (month: string, data: Expense[] | Income[]) => {
       return data.filter(item => {
-        // Vérification que item.date n'est pas null avant d'utiliser startsWith
-        return item.date && item.date.startsWith(month);
-      }).reduce((sum, item) => sum + item.amount, 0);
+        return item.created_at && item.created_at.startsWith(month);
+      }).reduce((sum, item) => sum + Number(item.amount), 0);
     };
 
     return {
@@ -187,15 +210,15 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
     },
   }), []);
 
-  const getCategoryColor = (categoryName: string) => {
-    const index = Object.keys(categoryData).indexOf(categoryName);
+  const getCategoryColor = (categoryId: string) => {
+    const index = Object.keys(categoryData).indexOf(categoryId);
     return index !== -1 ? categoryColors[index % categoryColors.length] : '#CCCCCC';
   };
 
   const hasExpenseData = Object.keys(categoryData).length > 0;
   const hasBarData = lastSixMonths.some(month =>
-    expenses.some(expense => expense.date && expense.date.startsWith(month)) ||
-    incomes.some(income => income.date && income.date.startsWith(month))
+    expenses.some(expense => expense.created_at && expense.created_at.startsWith(month)) ||
+    incomes.some(income => income.created_at && income.created_at.startsWith(month))
   );
 
   return (
@@ -207,11 +230,18 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Répartition des Dépenses</h3>
-          <div className="h-80">
-            {hasExpenseData ? <Doughnut data={doughnutData} options={doughnutOptions} /> : 
-              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-center">Aucune donnée de dépenses pour cette période</p>
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 mb-4">
+            <h3 className="text-xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2">
+              <span className="text-2xl">🥧</span>
+              Répartition des Dépenses
+            </h3>
+            <p className="text-sm text-gray-600 text-center">Visualisation par catégories</p>
+          </div>
+          <div className="h-80 bg-white rounded-xl p-4 shadow-inner">
+            {hasExpenseData ? <Doughnut data={doughnutData} options={doughnutOptions} /> :
+              <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl">
+                <div className="text-6xl mb-4">📊</div>
+                <p className="text-gray-500 text-center font-medium">Aucune donnée de dépenses pour cette période</p>
               </div>
             }
           </div>
@@ -221,14 +251,16 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
               <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Détails par catégorie</h4>
               <ul className="space-y-2 max-h-40 overflow-y-auto">
                 {Object.entries(categoryData)
-                  .sort(([, a], [, b]) => b - a)
-                  .map(([category, amount]) => (
-                    <li key={category} className="flex justify-between items-center text-sm">
+                  .sort(([, a], [, b]) => Number(b) - Number(a))
+                  .map(([categoryName, amount]) => (
+                    <li key={categoryName} className="flex justify-between items-center text-sm bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200">
                       <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: getCategoryColor(category) }} />
-                        <span className="text-gray-600">{category}</span>
+                        <div className="w-4 h-4 rounded-full mr-3 shadow-sm" style={{ backgroundColor: getCategoryColor(categoryName) }} />
+                        <span className="text-gray-700 font-medium">{categoryName}</span>
                       </div>
-                      <span className="font-medium text-gray-900">Ar {amount}</span>
+                      <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-lg">
+                        {Number(amount).toLocaleString('fr-FR')} Ar
+                      </span>
                     </li>
                   ))}
               </ul>
@@ -237,21 +269,34 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">Historique des Finances</h3>
-          <div className="h-80">
-            {hasBarData ? <Bar data={barData} options={barOptions} /> : 
-              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-center">Aucune donnée disponible pour l'historique</p>
+          <div className="bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl p-4 mb-4">
+            <h3 className="text-xl font-bold mb-2 text-center text-gray-800 flex items-center justify-center gap-2">
+              <span className="text-2xl">📈</span>
+              Historique des Finances
+            </h3>
+            <p className="text-sm text-gray-600 text-center">Évolution sur 6 mois</p>
+          </div>
+          <div className="h-80 bg-white rounded-xl p-4 shadow-inner">
+            {hasBarData ? <Bar data={barData} options={barOptions} /> :
+              <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl">
+                <div className="text-6xl mb-4">📈</div>
+                <p className="text-gray-500 text-center font-medium">Aucune donnée disponible pour l'historique</p>
               </div>
             }
           </div>
 
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-semibold mb-3 text-gray-700 border-b pb-2">Statistiques de la Période</h4>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="bg-green-100 p-3 rounded">
-                <div className="text-green-800 font-semibold">Revenus</div>
-                <div className="text-green-900 font-bold text-lg">Ar {periodIncome}</div>
+          <div className="mt-6 p-5 bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl border border-gray-200">
+            <h4 className="font-bold mb-4 text-gray-800 border-b border-gray-300 pb-3 flex items-center gap-2">
+              <span className="text-lg">📊</span>
+              Statistiques de la Période
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-gradient-to-br from-emerald-100 to-green-200 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className="text-green-800 font-bold flex items-center gap-1">
+                  <span className="text-lg">💰</span>
+                  Revenus
+                </div>
+                <div className="text-green-900 font-extrabold text-xl mt-1">Ar {periodIncomes.toLocaleString('fr-FR')}</div>
               </div>
               <div className="bg-red-100 p-3 rounded">
                 <div className="text-red-800 font-semibold">Dépenses</div>
