@@ -9,5 +9,5 @@ export interface Expense {
   date: string;
   created_at: string;
   receipt?: string | null;
-  category_id: string;
+  category_id: number;
 }

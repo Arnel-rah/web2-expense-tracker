@@ -4,8 +4,9 @@ import Charts from '../components/dashboard/Charts/Charts';
 import Filters from '../components/dashboard/Filters/Filters';
 import type { FiltersProps } from '../types/MonthlySummary.types';
 import { useApiData } from '../hooks/useApiData';
-import MonthlySummary from '../components/dashboard/MonthlySummary/MonthlySummary';
+import MonthlySummary from '../components/dashboard/MonthlySummary';
 import { useSummary } from '../hooks/useSummary';
+import { useDataProps } from '../utils/dataPropsHandler';
 import { getDefaultDateRange } from '../utils';
 
 const DashboardHeader = ({
@@ -52,7 +53,7 @@ export default function Dashboard() {
   const defaultDates = getDefaultDateRange();
   const [startDate, setStartDate] = useState(defaultDates.start);
   const [endDate, setEndDate] = useState(defaultDates.end);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Number[]>([]);
   const { expenses, incomes, categories } = useApiData();
 
   const { summary, monthlySummary } = useSummary();
@@ -71,7 +72,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (categories.length > 0) {
-      setSelectedCategories(categories.map(cat => cat.name));
+      setSelectedCategories(categories.map(cat => cat.category_id));
     }
   }, [categories]);
 
@@ -90,7 +91,7 @@ export default function Dashboard() {
     categories: categoriesWithColor
   };
 
-  const dataProps = {
+  const dataProps = useDataProps({
     summary: monthlySummary,
     expenses,
     incomes,
@@ -98,7 +99,12 @@ export default function Dashboard() {
     endDate,
     selectedCategories,
     categories: categoriesWithColor
-  };
+  });
+
+  // useEffect(() => {
+  //   console.log("DataProps object:", dataProps);
+  // }, [dataProps]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -117,11 +123,11 @@ export default function Dashboard() {
           />
 
           <div className="lg:col-span-3">
-            <MonthlySummary {...dataProps} />
+            <MonthlySummary {...dataProps} /> {/* Non verifier */}
           </div>
         </div>
 
-        <Charts {...dataProps} />
+        <Charts {...dataProps} /> {/* Non verifier */}
       </main>
     </div>
   );

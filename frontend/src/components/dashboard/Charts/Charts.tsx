@@ -21,7 +21,7 @@ interface ChartsProps {
   incomes: Income[];
   startDate: string;
   endDate: string;
-  selectedCategories: string[];
+  selectedCategories: Number[];
   categories: Category[];
 }
 
@@ -129,7 +129,6 @@ const Charts: React.FC<ChartsProps> = ({ expenses, incomes, startDate, endDate, 
   const barData = useMemo(() => {
     const calculateMonthlyData = (month: string, data: Expense[] | Income[]) => {
       return data.filter(item => {
-        // Vérification que item.date n'est pas null avant d'utiliser startsWith
         return item.date && item.date.startsWith(month);
       }).reduce((sum, item) => sum + item.amount, 0);
     };

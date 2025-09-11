@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import type { FiltersProps } from '../../types/MonthlySummary.types';
+import type { FiltersProps } from '../../../types/';
 
 const Filters: React.FC<FiltersProps> = ({
   startDate,
@@ -14,10 +14,10 @@ const Filters: React.FC<FiltersProps> = ({
 }) => {
   const [allSelected, setAllSelected] = useState(true);
 
-  const handleCategoryToggle = (categoryName: string) => {
-    const newCategories = selectedCategories.includes(categoryName)
-      ? selectedCategories.filter(c => c !== categoryName)
-      : [...selectedCategories, categoryName];
+  const handleCategoryToggle = (categorId: number) => {
+    const newCategories = selectedCategories.includes(categorId)
+      ? selectedCategories.filter(c => c !== categorId)
+      : [...selectedCategories, categorId];
     onCategoriesChange(newCategories);
     setAllSelected(newCategories.length === categories.length);
   };
@@ -27,7 +27,7 @@ const Filters: React.FC<FiltersProps> = ({
       onCategoriesChange([]);
       setAllSelected(false);
     } else {
-      onCategoriesChange(categories.map(c => c.name));
+      onCategoriesChange(categories.map(c => c.category_id));
       setAllSelected(true);
     }
   };
@@ -79,11 +79,11 @@ const Filters: React.FC<FiltersProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">Catégories</label>
           <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
             {categories.map(category => {
-              const isSelected = selectedCategories.includes(category.name);
+              const isSelected = selectedCategories.includes(category.category_id);
               return (
                 <button
                   key={category.category_id}
-                  onClick={() => handleCategoryToggle(category.name)}
+                  onClick={() => handleCategoryToggle(category.category_id)}
                   className={`p-2 rounded-lg flex items-center justify-center transition-all duration-200 text-sm font-medium ${
                     isSelected ? 'shadow-sm' : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:bg-gray-100'
                   }`}
@@ -100,7 +100,7 @@ const Filters: React.FC<FiltersProps> = ({
           </div>
           <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
             <p className="text-xs text-gray-600 text-center font-medium">
-              {selectedCategories.length === 0 ? 'Toutes catégories' : `${selectedCategories.length} catégorie(s) sélectionnée(s)`}
+              {selectedCategories.length === 0 ? 'Aucune catégorie seléctionner' : `${selectedCategories.length} catégorie(s) sélectionnée(s)`}
             </p>
           </div>
         </div>

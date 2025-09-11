@@ -7,8 +7,8 @@ export interface FiltersProps {
   endDate: string;
   onStartDateChange: (date: string) => void;
   onEndDateChange: (date: string) => void;
-  selectedCategories: string[];
-  onCategoriesChange: (categories: string[]) => void;
+  selectedCategories: Number[];
+  onCategoriesChange: (categories: Number[]) => void;
   categories: Category[];
 }
 
@@ -21,26 +21,28 @@ export interface FinancialItem {
 
 export interface MonthlySummaryProps {
   summary?: {
-    total_income: number | string;
-    total_expenses: number | string;
+    total_income: number;
+    total_expenses: number;
+    totalExpenses: number;
+    totalIncome: number;
     balance: number;
   };
   expenses: Expense[];
   incomes: Income[];
   startDate: string;
   endDate: string;
-  selectedCategories: string[];
+  selectedCategories: Number[];
 }
 
-export interface FinancialCalculations {
-  filteredIncomes: Income[];
-  filteredExpenses: Expense[];
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-  savingsRate: number;
-  expenseRate: number;
-  largestExpense: Expense | null;
-  isOverBudget: boolean;
-  overBudgetAmount: number;
-}
+// export interface FinancialCalculations {
+//   filteredIncomes: Income[];
+//   filteredExpenses: Expense[];
+//   totalIncome: number;
+//   totalExpenses: number;
+//   balance: number;
+//   savingsRate: number;
+//   expenseRate: number;
+//   largestExpense: Expense | null;
+//   isOverBudget: boolean;
+//   overBudgetAmount: number;
+// }
