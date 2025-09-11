@@ -127,7 +127,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           required
           value={formData.amount}
           onChange={handleChange}
-          className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-transparent"
+          className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Ex: 75.50"
         />
       </div>
@@ -142,7 +142,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
             required
             value={formData.date}
             onChange={handleChange}
-            className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-transparent"
+            className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       )}
@@ -155,7 +155,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           required
           value={formData.categoryId}
           onChange={handleChange}
-          className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-transparent"
+          className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select a category</option>
           {categoriesData.map((category: Category) => (
@@ -186,7 +186,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           name="description"
           value={formData.description}
           onChange={handleChange}
-          className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-transparent"
+          className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Ex: Lunch with colleagues"
         />
       </div>
@@ -196,7 +196,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           type="checkbox"
           checked={isRecurring}
           onChange={(e) => setIsRecurring(e.target.checked)}
-          className="border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-transparent"
+          className="border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <label className="ml-2 text-sm font-medium text-gray-700">
           Recurring Expense
@@ -246,7 +246,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-transparent"
+              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -259,7 +259,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
               name="endDate"
               value={formData.endDate}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-transparent"
+              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
