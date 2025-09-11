@@ -12,18 +12,10 @@ import {
 } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons';
-import type { Category, Expense, Income } from '../../../types';
+import type { ChartsProps, Expense, Income } from '../../../types';
+import { Statistics } from './StatisticPeriodes';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
-
-interface ChartsProps {
-  expenses: Expense[];
-  incomes: Income[];
-  startDate: string;
-  endDate: string;
-  selectedCategories: Number[];
-  categories: Category[];
-}
 
 const Charts: React.FC<ChartsProps> = ({
   expenses,
@@ -271,29 +263,11 @@ const Charts: React.FC<ChartsProps> = ({
             }
           </div>
 
-          <div className="mt-6 p-5 bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl border border-gray-200">
-            <h4 className="font-bold mb-4 text-gray-800 border-b border-gray-300 pb-3 flex items-center gap-2">
-              <span className="text-lg">📊</span>
-              Statistiques de la Période
-            </h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-gradient-to-br from-emerald-100 to-green-200 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="text-green-800 font-bold flex items-center gap-1">
-                  <span className="text-lg">💰</span>
-                  Revenus
-                </div>
-                <div className="text-green-900 font-extrabold text-xl mt-1">Ar {periodIncomes.toLocaleString('fr-FR')}</div>
-              </div>
-              <div className="bg-red-100 p-3 rounded">
-                <div className="text-red-800 font-semibold">Dépenses</div>
-                <div className="text-red-900 font-bold text-lg">Ar {periodExpenses.toFixed(2)}</div>
-              </div>
-              <div className={`${periodBalance >= 0 ? 'bg-blue-100' : 'bg-orange-100'} p-3 rounded col-span-2`}>
-                <div className={`${periodBalance >= 0 ? 'text-blue-800' : 'text-orange-800'} font-semibold`}>Solde Final</div>
-                <div className={`${periodBalance >= 0 ? 'text-blue-900' : 'text-orange-900'} font-bold text-lg`}>Ar {periodBalance.toFixed(2)}</div>
-              </div>
-            </div>
-          </div>
+            <Statistics
+              periodIncomes={periodIncomes}
+              periodExpenses={periodExpenses}
+              periodBalance={periodBalance}
+            />
         </div>
       </div>
     </div>

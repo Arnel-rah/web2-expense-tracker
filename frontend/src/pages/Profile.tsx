@@ -13,11 +13,7 @@ import {
   faLightbulb
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
-
-interface UserProfile {
-  email: string;
-  createdAt?: string;
-}
+import type { UserProfile } from "../types";
 
 export default function Profile() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);

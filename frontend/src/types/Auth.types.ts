@@ -19,6 +19,11 @@ export interface AuthError extends Error {
   details?: any;
 }
 
+export interface UserProfile {
+  email: string;
+  createdAt?: string;
+}
+
 export interface User {
   user_id: number;
   email: string;

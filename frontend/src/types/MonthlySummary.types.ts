@@ -34,3 +34,18 @@ export interface MonthlySummaryProps {
   selectedCategories: Number[];
   categories: Category[];
 }
+
+export interface ChartsProps {
+  expenses: Expense[];
+  incomes: Income[];
+  startDate: string;
+  endDate: string;
+  selectedCategories: Number[];
+  categories: Category[];
+}
+
+export interface StatisticsProps {
+  periodIncomes: number;
+  periodExpenses: number;
+  periodBalance: number;
+}

@@ -86,9 +86,9 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
       if (result.token) {
         const successMessage = isSignupMode ? "Account created successfully!" : "Login successful!";
         toast.success(successMessage);
-        
+
         setIsNavigating(true);
-        
+
         setTimeout(() => {
           navigate("/dashboard");
         }, 1000);
@@ -152,9 +152,9 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
 
   return (
     <div className="min-h-screen flex flex-row-reverse items-center justify-around px-6 lg:px-20 bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      
+
       <div className="max-w-md w-full space-y-8 p-8 rounded-2xl shadow-xl bg-white/80 backdrop-blur-sm border border-gray-200">
-        
+
         <div className="space-y-3 flex flex-col items-center">
           <h2 className="text-center text-4xl font-extrabold text-gray-900 tracking-tight">
             Expense Tracker
@@ -165,7 +165,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
         </div>
 
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-          
+
           <div className="space-y-5">
             {formFields.map((field) => (
               <div key={field.id}>
@@ -212,9 +212,9 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
               {linkText}
             </Link>
           </p>
-        
+
         </form>
-      
+
       </div>
 
       <div className="hidden md:flex flex-col items-center space-y-4">
@@ -227,7 +227,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
           Manage your expenses with ease and keep track of your finances anywhere.
         </p>
       </div>
-    
+
     </div>
   );
 };
