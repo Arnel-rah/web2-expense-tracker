@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
-import { createUser, findUserByEmail } from "../models/userModel.js";
+import { createUser, findUserByEmail, findUserById, updatePassword } from "../models/userModel.js";
 
 // Inscription
 export const signup = async (req, res) => {
@@ -22,7 +22,7 @@ export const signup = async (req, res) => {
 
     // Générer un token JWT (inscription --> connexion)
     const token = jwt.sign(
-      { userId: newUser.user_id, email: newUser.email }, 
+      { userId: newUser.user_id, email: newUser.email },
       config.jwtSecret,
       { expiresIn: "1h" }
     );
@@ -31,7 +31,7 @@ export const signup = async (req, res) => {
       message: "Utilisateur créé avec succès",
       user: {
         userId: newUser.user_id,
-           email: newUser.email
+        email: newUser.email
       },
       token
     });
@@ -59,7 +59,7 @@ export const login = async (req, res) => {
 
     // Générer un token JWT (connexion)
     const token = jwt.sign(
-      { userId: user.user_id, email: user.email }, 
+      { userId: user.user_id, email: user.email },
       config.jwtSecret,
       { expiresIn: "1h" }
     );
@@ -67,7 +67,7 @@ export const login = async (req, res) => {
     res.json({
       message: "Connexion réussie",
       user: {
-        userId: user.user_id, 
+        userId: user.user_id,
         email: user.email
       },
       token
@@ -76,3 +76,34 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la connexion", error: err.message });
   }
 };
+
+export const changePassword = async (req, res) => {
+  const userId = req.userId;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await findUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." })
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters." })
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      return res.status(400).json({ message: "Current password is incorrect." })
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    res.json({ message: "Password up to date." });
+
+    updatePassword(userId, hashedNewPassword);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error server", error: error.message })
+  }
+}

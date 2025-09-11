@@ -5,14 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
   faUser, 
   faEnvelope, 
-  faCalendar, 
   faLock, 
   faShieldAlt, 
   faChartBar, 
   faMoneyBillWave,
   faCheckCircle,
   faTimesCircle,
-  faExclamationTriangle,
   faLightbulb
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -26,38 +24,23 @@ export default function Profile() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(true);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    fetchUserProfile();
+    let email = "";
+    if (!email) {
+      const storedUserData = localStorage.getItem("user_data");
+      if (storedUserData) {
+        const parsedData = JSON.parse(storedUserData);
+        email = parsedData.email;
+      }
+    }
+    if (!email) email = "";
+
+    setUserProfile({ email });
   }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      const profile = await apiFetch("/user/profile");
-      setUserProfile(profile);
-    } catch (err) {
-      const userEmail = getEmailFromToken() || localStorage.getItem("userEmail") || "user@example.com";
-      setUserProfile({ email: userEmail });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getEmailFromToken = (): string => {
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) return "";
-      
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.email || "";
-    } catch {
-      return "";
-    }
-  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,35 +54,20 @@ export default function Profile() {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters");
-      setPasswordLoading(false);
-      return;
-    }
 
     try {
       await apiFetch("/auth/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-        }),
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
       });
 
       setSuccess("Password changed successfully!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      
-    } catch (err) {
-      setError(
-        err instanceof Error 
-          ? err.message 
-          : "Feature not available. Please contact support."
-      );
+    } catch (err: any) {
+      setError(err.message || "Feature not available. Please contact support.");
     } finally {
       setPasswordLoading(false);
     }
@@ -119,7 +87,6 @@ export default function Profile() {
   return (
     <>
       <Header />
-      
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
@@ -146,7 +113,6 @@ export default function Profile() {
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
                 Personal Information
               </h2>
-
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -157,18 +123,6 @@ export default function Profile() {
                     {userProfile?.email || "Not available"}
                   </div>
                 </div>
-
-                {userProfile?.createdAt && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-                      Member Since
-                    </label>
-                    <div className="p-3 bg-gray-100 rounded-lg text-gray-600">
-                      {new Date(userProfile.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
