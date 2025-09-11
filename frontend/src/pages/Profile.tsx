@@ -29,17 +29,13 @@ export default function Profile() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    let email = "";
-    if (!email) {
-      const storedUserData = localStorage.getItem("user_data");
-      if (storedUserData) {
-        const parsedData = JSON.parse(storedUserData);
-        email = parsedData.email;
-      }
+    const storedUserData = localStorage.getItem("user_data");
+    if (storedUserData) {
+      const parsedData = JSON.parse(storedUserData);
+      setUserProfile({ email: parsedData.email });
+    } else {
+      setUserProfile({ email: "Non disponible" });
     }
-    if (!email) email = "";
-
-    setUserProfile({ email });
   }, []);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -72,17 +68,6 @@ export default function Profile() {
       setPasswordLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-lg">Loading profile...</div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>

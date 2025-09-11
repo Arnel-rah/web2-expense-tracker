@@ -15,21 +15,10 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   console.log("summary:", monthlySummary.summary);
-  //   console.log("expenses:", monthlySummary.expenses);
-  //   console.log("incomes:", monthlySummary.incomes);
-  //   console.log("date:", monthlySummary.startDate + "--->" + monthlySummary.endDate);
-  //   console.log("selectedCategories:", monthlySummary.selectedCategories);
-  // }, [monthlySummary]);
-
   const handleReload = async () => {
-    // if (!onReload) return;
-
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, LOADING_DELAY));
-      // await onReload();
     } catch (error) {
       console.error("Erreur lors du rechargement:", error);
     } finally {
@@ -71,7 +60,7 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
         endDate={monthlySummary.endDate}
         hasData={hasData}
         isLoading={isLoading}
-      // onReload={onReload ? handleReload : undefined}
+        onReload={handleReload}
       />
 
       {!hasData ? (
@@ -80,24 +69,24 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
         <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <FinancialCard
-          title={"Incomes"}
-          amount={monthlySummary.summary?.total_income + ''}
+          title="Revenus"
+          amount={summaryData.total_income}
           count={monthlySummary.incomes.length}
-          theme={'green'}
+          theme="green"
           itemName="source"
           tooltip="Total des revenus pour la période sélectionnée"
         />
         <FinancialCard
-          title={"Depenses"}
-          amount={summaryData.total_expenses.toString()}
+          title="Dépenses"
+          amount={summaryData.total_expenses}
           count={monthlySummary.expenses.length}
-          theme={'red'}
+          theme="red"
           itemName="dépense"
           tooltip="Total des dépenses pour la période sélectionnée"
         />
         <FinancialCard
-          title={"Solde"}
-          amount={summaryData.balance.toString()}
+          title="Solde"
+          amount={summaryData.balance}
           theme={summaryData.balance >= 0 ? 'blue' : 'orange'}
           tooltip={summaryData.balance >= 0 ? 'Solde positif (épargne)' : 'Solde négatif (déficit)'}
         >
@@ -123,8 +112,7 @@ const MonthlySummary = (monthlySummary: MonthlySummaryProps) => {
         />
       )}
     </>
-  )
-}
+      )}
     </div >
   );
 };
