@@ -2,6 +2,8 @@ import pool from '../config/database.js';
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 
+const formatDate = (date) => date ? new Date(date).toISOString().split('T')[0] : null;
+
 export const getIncomes = async (req, res) => {
   const { start, end } = req.query;
   const token = req.headers.authorization?.split(' ')[1];
@@ -9,7 +11,7 @@ export const getIncomes = async (req, res) => {
   let query = 'SELECT * FROM revenu WHERE user_id = $1';
   const values = [userId];
 
-    if (start) {
+  if (start) {
     query += ' AND date >= $' + (values.length + 1);
     values.push(new Date(start));
   }
@@ -20,7 +22,11 @@ export const getIncomes = async (req, res) => {
 
   try {
     const result = await pool.query(query, values);
-    res.json(result.rows);
+    const formatted = result.rows.map(row => ({
+      ...row,
+      date: formatDate(row.date)
+    }));
+    res.json(formatted);
   } catch (error) {
     res.status(500).json({ message: 'Error getting incomes' });
   }
@@ -30,10 +36,12 @@ export const getIncomeById = async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   const userId = jwt.verify(token, config.jwtSecret).userId;
   const query = 'SELECT * FROM revenu WHERE income_id = $1 AND user_id = $2';
-    try {
+
+  try {
     const result = await pool.query(query, [req.params.id, userId]);
     if (result.rows.length === 0) return res.status(404).json({ message: 'Income not found' });
-    res.json(result.rows[0]);
+    const row = result.rows[0];
+    res.json({ ...row, date: formatDate(row.date) });
   } catch (error) {
     res.status(500).json({ message: 'Error getting income' });
   }
@@ -46,9 +54,10 @@ export const createIncome = async (req, res) => {
   const query = 'INSERT INTO revenu (amount, "date", source, description, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *';
   const values = [amount, date, source, description, userId];
 
-    try {
+  try {
     const result = await pool.query(query, values);
-    res.status(201).json(result.rows[0]);
+    const row = result.rows[0];
+    res.status(201).json({ ...row, date: formatDate(row.date) });
   } catch (error) {
     res.status(400).json({ message: 'Error creating income' });
   }
@@ -64,7 +73,8 @@ export const updateIncome = async (req, res) => {
   try {
     const result = await pool.query(query, values);
     if (result.rows.length === 0) return res.status(404).json({ message: 'Income not found' });
-    res.json(result.rows[0]);
+    const row = result.rows[0];
+    res.json({ ...row, date: formatDate(row.date) });
   } catch (error) {
     res.status(400).json({ message: 'Error updating income' });
   }

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { apiFetch } from "../api/api";
+import toast from "react-hot-toast";
 
 export interface FormDataBase {
-  id?: number;
   income_id?: number;
   expense_id?: number;
 }
 
 export default function useForm<T extends FormDataBase>(
-  initialValues: T, 
+  initialValues: T,
   endpointBase: string,
-  onSuccess?: () => void 
+  onSuccess?: () => void
 ) {
   const [formData, setFormData] = useState(initialValues);
   const [success, setSuccess] = useState<string | null>(null);
@@ -49,22 +49,23 @@ export default function useForm<T extends FormDataBase>(
         },
         body: JSON.stringify(formData),
       });
-      
-      setSuccess(isUpdate ? "Mise à jour réussie !" : "Ajout réussi !");
-      
+      toast.success(isUpdate ? "Successfully updated" : "Successfully added");
+
+
       if (!isUpdate) {
         setFormData(initialValues);
       }
-      
+
       if (onSuccess) {
-        onSuccess(); 
+        onSuccess();
       }
-      
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
+
   };
 
   const resetForm = () => {
