@@ -10,7 +10,7 @@ interface FormData extends FormDataBase {
   expense_id?: number;
   amount: number;
   date: string;
-  categoryId: number | string;
+  category_id: number | string;
   description: string;
   type: string;
   startDate: string;
@@ -41,7 +41,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
     {
       amount: 0,
       date: '',
-      categoryId: 0,
+      category_id: 0,
       description: '',
       type: 'one-time',
       receipt: null,
@@ -66,9 +66,9 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let finalCategoryId: number = Number(formData.categoryId);
+    let finalCategoryId: number = Number(formData.category_id);
 
-    if (formData.categoryId === "new" && formData.newCategory) {
+    if (formData.category_id === "new" && formData.newCategory) {
       try {
         const newCat = await apiFetch("/categories", {
           method: "POST",
@@ -150,10 +150,10 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
       <div className="flex flex-col">
         <label className="mb-1 text-sm font-medium text-gray-700">Category</label>
         <select
-          name="categoryId"
-          id="categoryId"
+          name="category_id"
+          id="category_id"
           required
-          value={formData.categoryId}
+          value={formData.category_id}
           onChange={handleChange}
           className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
@@ -165,7 +165,7 @@ export default function ExpenseForm({ existingExpense = null, onSuccess }: Expen
           <option value="new">+ Add new category</option>
         </select>
 
-        {formData.categoryId === "new" && (
+        {formData.category_id === "new" && (
           <input
             type="text"
             name="newCategory"
