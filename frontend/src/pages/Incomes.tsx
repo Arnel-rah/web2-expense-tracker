@@ -35,11 +35,11 @@ export default function Income() {
     return (
         <>
             <Header />
-            <div className="flex">
-                <div className="w-2/5">
-                    <IncomeForm 
-                    existingIncome={editingIncome}
-                    onSuccess={handleFormSuccess}
+            <div className="flex justify-center gap-6">
+                <div className="w-[30%]">
+                    <IncomeForm
+                        existingIncome={editingIncome}
+                        onSuccess={handleFormSuccess}
                     />
                 </div>
                 <div className="w-3/5">

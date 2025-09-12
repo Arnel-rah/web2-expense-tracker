@@ -31,14 +31,14 @@ export default function Expense() {
   return (
     <>
       <Header />
-      <div className="flex">
-        <div className="w-2/5">
+      <div className="flex justify-center gap-6">
+        <div className="w-[30%]">
           <ExpenseForm 
             existingExpense={editingExpense} 
             onSuccess={handleFormSuccess}
           />
         </div>
-        <div className="w-3/5">
+        <div className="w-[60%]">
           <List
             data={data || []}
             transaction="expense"
