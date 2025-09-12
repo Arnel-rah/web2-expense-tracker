@@ -53,7 +53,7 @@ export default function IncomeForm({ existingIncome = null, onSuccess }: IncomeF
       className="bg-white shadow-2xl w-full max-w-2xl mx-auto mt-8 p-6 rounded-2xl space-y-4"
     >
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
-        {formData.id ? "Edit Income" : "Add Income"}
+        {formData.income_id ? "Edit Income" : "Add Income"}
       </h2>
 
       <div className="flex flex-col">
@@ -116,7 +116,7 @@ export default function IncomeForm({ existingIncome = null, onSuccess }: IncomeF
           disabled={loading}
           className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
-          {loading ? 'Loading...' : (formData.id ? "Update" : "Add")}
+          {loading ? 'Loading...' : (formData.income_id ? "Update" : "Add")}
         </button>
       </div>
 
