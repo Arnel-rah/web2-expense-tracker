@@ -51,13 +51,9 @@ export default function useForm<T extends FormDataBase>(
       });
       toast.success(isUpdate ? "Successfully updated" : "Successfully added");
 
-
-      if (!isUpdate) {
-        setFormData(initialValues);
-      }
-
       if (onSuccess) {
         onSuccess();
+        setFormData(initialValues);
       }
 
     } catch (err) {
